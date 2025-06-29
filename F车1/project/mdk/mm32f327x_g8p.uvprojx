@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>7</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -448,6 +448,36 @@
               <FileName>Encoder.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\code\Encoder.h</FilePath>
+            </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\key.c</FilePath>
+            </File>
+            <File>
+              <FileName>key.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\key.h</FilePath>
+            </File>
+            <File>
+              <FileName>auto_menu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\auto_menu.c</FilePath>
+            </File>
+            <File>
+              <FileName>auto_menu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\auto_menu.h</FilePath>
+            </File>
+            <File>
+              <FileName>Tracking.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Tracking.c</FilePath>
+            </File>
+            <File>
+              <FileName>Tracking.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Tracking.h</FilePath>
             </File>
           </Files>
         </Group>

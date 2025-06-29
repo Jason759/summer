@@ -35,16 +35,43 @@
 
 #include "zf_common_headfile.h"
 #include "Picture.h"
+#include "motor.h"
 #include "Encoder.h"
+#include "auto_menu.h"
+#include "PID.h"
+PID_t left={
+	  .kp=0.08,
+	  .ki=0.09,
+	  .kd=0,
+	  .maxout=100,
+	  .minout=-100,
+	  .targ=0
+};
+PID_t right={
+	  .kp=0.08,
+	  .ki=0.09,
+	  .kd=0,
+	  .maxout=100,
+	  .minout=-100,
+    .targ=0
+};
 int main (void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
 	  ips200_init(IPS200_TYPE_SPI);	//初始化ISP200
     mt9v03x_init();
+	  Motor_Init();
 	  Encoder_Init();
+	  ips200_clear();
+	  menu_init();
+	  pit_ms_init(TIM2_PIT, 20);
+	  interrupt_set_priority(TIM2_IRQn, 0);
+	  interrupt_set_priority(TIM5_IRQn, 1);
 	  while(1)
     {
-       picture_process();
+       show_process(NULL);
+       system_delay_ms(20);       //运行菜单
+			 image_process();
     }
 }
