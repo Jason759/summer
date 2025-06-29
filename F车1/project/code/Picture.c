@@ -1,5 +1,5 @@
 #include "zf_common_headfile.h"
-#include "Picture.h""
+#include "Picture.h"
 /*变量声明*/
 uint8 original_image[image_h][image_w];
 uint8 image_thereshold;//图像分割阈值
@@ -76,6 +76,10 @@ uint8 otsuThreshold(const uint8 *image) //找阈值——大津法
     }
    return Threshold;
 }
+
+
+
+
 void picture_process(){
 	image_thereshold=otsuThreshold((const uint8*)mt9v03x_image);
 	if(mt9v03x_finish_flag)

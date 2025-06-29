@@ -439,6 +439,16 @@
               <FileType>5</FileType>
               <FilePath>..\code\motor.h</FilePath>
             </File>
+            <File>
+              <FileName>Encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>Encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Encoder.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
