@@ -32,13 +32,13 @@ void Get_image(uint8(*mt9v03x_image)[image_w])
     }
 }
 
-uint8 otsuThreshold(uint8 *image) //找阈值——大津法
+uint8 otsuThreshold(uint8 *image) //找阈值——大津法(已优化-遇到递减直接退出)
 {
 #define GrayScale 256
 	  int i;
     const uint8 *data = image;
     int HistGram[GrayScale] = {0};
-	  int Amount =128;
+	  int Amount =image_w*image_h/4;
     int PixelBack = 0;   //前景像素点数
     int PixelIntegralBack = 0;  
     int PixelIntegral = 0;
@@ -47,9 +47,9 @@ uint8 otsuThreshold(uint8 *image) //找阈值——大津法
     double OmegaBack=0, OmegaFore=0, MicroBack=0, MicroFore=0, SigmaB=0, Sigma=0; // 类间方差;
     int MinValue=0, MaxValue=0;
     int Threshold = 0;
-    for (i = 0; i <MT9V03X_H; i++)
+    for (i = 0; i <MT9V03X_H; i+=2)
     {
-        for(int j=0;j<MT9V03X_W;j++){
+        for(int j=0;j<MT9V03X_W;j+=2){
         HistGram[data[i*MT9V03X_W+j]]++; //统计每个灰度值的个数信息
         }
     }
@@ -65,7 +65,7 @@ uint8 otsuThreshold(uint8 *image) //找阈值——大津法
         return MinValue;      // 图像中只有二个颜色
     }
     PixelIntegral = 0;
-    for (i= MinValue; i <= MaxValue; i++)
+    for (i= MinValue; i <= MaxValue; i+=2)
     {
         PixelIntegral += HistGram[i] * i;//灰度值总数
     }
@@ -86,6 +86,8 @@ uint8 otsuThreshold(uint8 *image) //找阈值——大津法
               SigmaB = Sigma;
               Threshold = (int)i;
           }
+					if(Sigma<SigmaB){break;}
+						
     }
    return Threshold;
 }
@@ -107,33 +109,33 @@ void turn_to_bin(void)
 
 /*
 函数名称：void get_start_point(uint8 start_row)
-功能说明：寻找两个边界的边界点作为八邻域循环的起始点
-参数说明：输入任意行数
+功能说明：从最下方开始寻找两个边界的边界点作为八邻域循环的起始点
+参数说明：
 函数返回：无
-修改时间：2022年9月8日
 备    注：
 example：  get_start_point(image_h-2)
  */
 uint8 start_point_l[2] = { 0 };//左边起点的x，y值
 uint8 start_point_r[2] = { 0 };//右边起点的x，y值
-uint8 get_start_point(uint8 start_row)
-{
-	uint8 i = 0,l_found = 0,r_found = 0;
+uint8 get_start_point(void)
+{ 
 	//清零
 	start_point_l[0] = 0;//x
 	start_point_l[1] = 0;//y
 
 	start_point_r[0] = 0;//x
 	start_point_r[1] = 0;//y
+	uint8 i = 0,l_found = 0,r_found = 0;
+	for(uint8 j=image_h-2;j>image_h-10;j--){
 
 		//从中间往左边，先找起点
 	for (i = image_w / 2; i > border_min; i--)
 	{
-		start_point_l[0] = i;//x
-		start_point_l[1] = start_row;//y
-		if (bin_image[start_row][i] == 255 && bin_image[start_row][i - 1] == 0)
+		start_point_l[0] = i-2;//x
+		start_point_l[1] = j;//y
+		if (bin_image[j][i] == 255 && bin_image[j][i - 1] == 255&&bin_image[j][i-2]==0)
 		{
-			//printf("找到左边起点image[%d][%d]\n", start_row,i);
+			//printf("找到左边起点image[%d][%d]\n", j,i-2);
 			l_found = 1;
 			break;
 		}
@@ -141,22 +143,20 @@ uint8 get_start_point(uint8 start_row)
 
 	for (i = image_w / 2; i < border_max; i++)
 	{
-		start_point_r[0] = i;//x
-		start_point_r[1] = start_row;//y
-		if (bin_image[start_row][i] == 255 && bin_image[start_row][i + 1] == 0)
+		start_point_r[0] = i+2;//x
+		start_point_r[1] = j;//y
+		if (bin_image[j][i] == 255 && bin_image[j][i + 1] == 255&&bin_image[j][i + 2]==0)
 		{
 			//printf("找到右边起点image[%d][%d]\n",start_row, i);
 			r_found = 1;
 			break;
 		}
 	}
-
-	if(l_found&&r_found)return 1;
-	else {
-		//printf("未找到起点\n");
-		return 0;
-	} 
-}
+if(l_found&&r_found) {ips200_show_int(100,300,j,3);
+break;}	
+	}
+   return 1;	
+	}
 
 /*
 函数名称：void search_l_r(uint16 break_flag, uint8(*image)[image_w],uint16 *l_stastic, uint16 *r_stastic,
@@ -197,10 +197,10 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 	uint8 i = 0, j = 0;
 
 	//左边变量
-	uint8 search_filds_l[8][2] = { {  0 } };
-	uint8 index_l = 0;
-	uint8 temp_l[8][2] = { {  0 } };
-	uint8 center_point_l[2] = {  0 };
+	uint8 search_filds_l[8][2] = { {  0 } };    //中心点八领域的点坐标
+	uint8 index_l = 0;                  //索引下标
+	uint8 temp_l[8][2] = { {  0 } };   //缓存
+	uint8 center_point_l[2] = {  0 };  //中心坐标点
 	uint16 l_data_statics;//统计左边
 	//定义八个邻域
 	static int8 seeds_l[8][2] = { {0,  1},{-1,1},{-1,0},{-1,-1},{0,-1},{1,-1},{1,  0},{1, 1}, };
@@ -259,7 +259,7 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 		index_l = 0;//先清零，后使用
 		for (i = 0; i < 8; i++)
 		{
-			temp_l[i][0] = 0;//先清零，后使用
+			temp_l[i][0] = 0;//先清零，后使用   
 			temp_l[i][1] = 0;//先清零，后使用
 		}
 
@@ -371,7 +371,7 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 }
 /*
 函数名称：void get_left(uint16 total_L)
-功能说明：从八邻域边界里提取需要的边线
+功能说明：从八邻域边界里提取需要的边线，找的是最靠近中间的点
 参数说明：
 total_L	：找到的点的总数
 函数返回：无
@@ -441,10 +441,10 @@ void get_right(uint16 total_R)
 		if (h == 0)break;//到最后一行退出
 	}
 }
-
 //定义膨胀和腐蚀的阈值区间
 #define threshold_max	255*5//此参数可根据自己的需求调节
 #define threshold_min	255*2//此参数可根据自己的需求调节
+//图像滤波
 void image_filter(uint8(*bin_image)[image_w])//形态学滤波，简单来说就是膨胀和腐蚀的思想
 {
 	uint16 i, j;
@@ -464,7 +464,6 @@ void image_filter(uint8(*bin_image)[image_w])//形态学滤波，简单来说就
 
 			if (num >= threshold_max && bin_image[i][j] == 0)
 			{
-
 				bin_image[i][j] = 255;//白  可以搞成宏定义，方便更改
 
 			}
@@ -479,7 +478,7 @@ void image_filter(uint8(*bin_image)[image_w])//形态学滤波，简单来说就
 
 /*
 函数名称：void image_draw_rectan(uint8(*image)[image_w])
-功能说明：给图像画一个黑框
+功能说明：给图像画一个黑框，防止找不到边线
 参数说明：uint8(*image)[image_w]	图像首地址
 函数返回：无
 修改时间：2022年9月8日
@@ -506,6 +505,132 @@ void image_draw_rectan(uint8(*image)[image_w])
 
 	}
 }
+float Slope_Calculate(uint8 begin, uint8 end, uint8 *border)   //最小二乘法，计算斜率
+{
+	float xsum = 0, ysum = 0, xysum = 0, x2sum = 0;
+	int16 i = 0;
+	float result = 0;
+	static float resultlast;
+
+	for (i = begin; i < end; i++)
+	{
+		xsum += i;
+		ysum += border[i];
+		xysum += i * (border[i]);
+		x2sum += i * i;
+
+	}
+	if ((end - begin)*x2sum - xsum * xsum) //判断除数是否为零
+	{
+		result = ((end - begin)*xysum - xsum * ysum) / ((end - begin)*x2sum - xsum * xsum);
+		resultlast = result;
+	}
+	else
+	{
+		result = resultlast;
+	}
+	return result;
+}
+
+void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, float *intercept)
+{
+	uint16 i, num = 0;
+	uint16 xsum = 0, ysum = 0;
+	float y_average, x_average;
+
+	num = 0;
+	xsum = 0;
+	ysum = 0;
+	y_average = 0;
+	x_average = 0;
+	for (i = start; i < end; i++)
+	{
+		xsum += i;
+		ysum += border[i];
+		num++;
+	}
+
+	//计算各个平均数
+	if (num)
+	{
+		x_average = (float)(xsum / num);
+		y_average = (float)(ysum / num);
+
+	}
+
+	/*计算斜率*/
+	*slope_rate = Slope_Calculate(start, end, border);//斜率
+	*intercept = y_average - (*slope_rate)*x_average;//截距
+}
+//* @brief 十字补线函数
+//* @param uint8(*image)[image_w]		输入二值图像
+//* @param uint8 *l_border			输入左边界首地址
+//* @param uint8 *r_border			输入右边界首地址
+//* @param uint16 total_num_l			输入左边循环总次数
+//* @param uint16 total_num_r			输入右边循环总次数
+//* @param uint16 *dir_l				输入左边生长方向首地址
+//* @param uint16 *dir_r				输入右边生长方向首地址
+//* @param uint16(*points_l)[2]		输入左边轮廓首地址
+//* @param uint16(*points_r)[2]		输入右边轮廓首地址
+//*  @see CTest		cross_fill(image,l_border, r_border, data_statics_l, data_statics_r, dir_l, dir_r, points_l, points_r);
+//* @return 返回说明
+//*     -<em>false</em> fail
+//*     -<em>true</em> succeed
+void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16 total_num_l, uint16 total_num_r,
+										 uint16 *dir_l, uint16 *dir_r, uint16(*points_l)[2], uint16(*points_r)[2])
+{
+	uint8 i;
+	uint8 break_num_l = 0;
+	uint8 break_num_r = 0;
+	uint8 start, end;
+	float slope_l_rate = 0, intercept_l = 0;
+	//出十字
+	for (i = 1; i < total_num_l; i++)
+	{
+		if (dir_l[i - 1] == 4 && dir_l[i] == 4 && dir_l[i + 3] == 6 && dir_l[i + 5] == 6 && dir_l[i + 7] == 6)   //
+		{
+			break_num_l = points_l[i][1];//传递y坐标
+			break;
+		}
+	}
+	for (i = 1; i < total_num_r; i++)
+	{
+		if (dir_r[i - 1] == 4 && dir_r[i] == 4 && dir_r[i + 3] == 6 && dir_r[i + 5] == 6 && dir_r[i + 7] == 6)
+		{
+			break_num_r = points_r[i][1];//传递y坐标
+			break;
+		}
+	}
+	if (break_num_l&&break_num_r&&image[image_h - 2][4] && image[image_h - 1][image_w - 4])//两边生长方向都符合条件
+	{
+		//计算斜率
+		start = break_num_l - 15;
+		start = limit_a_b(start, 0, image_h);
+		end = break_num_l - 5;
+		calculate_s_i(start, end, l_border, &slope_l_rate, &intercept_l);
+		//printf("slope_l_rate:%d\nintercept_l:%d\n", slope_l_rate, intercept_l);
+		for (i = break_num_l - 5; i < image_h - 1; i++)
+		{
+			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
+		}
+
+		//计算斜率
+		start = break_num_r - 15;//起点
+		start = limit_a_b(start, 0, image_h);//限幅
+		end = break_num_r - 5;//终点
+		calculate_s_i(start, end, r_border, &slope_l_rate, &intercept_l);
+		//printf("slope_l_rate:%d\nintercept_l:%d\n", slope_l_rate, intercept_l);
+		for (i = break_num_r - 5; i < image_h - 1; i++)
+		{
+			r_border[i] = slope_l_rate * (i)+intercept_l;
+			r_border[i] = limit_a_b(r_border[i], border_min, border_max);
+		}
+
+
+	}
+
+}
 
 /*
 函数名称：void image_process(void)
@@ -529,16 +654,15 @@ image_draw_rectan(bin_image);//预处理
 //清零
 data_stastics_l = 0;
 data_stastics_r = 0;
-if (get_start_point(image_h - 2))//找到起点了，再执行八领域，没找到就一直找
+if (get_start_point())//找到起点了，再执行八领域，没找到就一直找
 {
-	printf("正在开始八领域\n");
+	
 	search_l_r((uint16)USE_num, bin_image, &data_stastics_l, &data_stastics_r, start_point_l[0], start_point_l[1], start_point_r[0], start_point_r[1], &hightest);
-	printf("八邻域已结束\n");
 	// 从爬取的边界线内提取边线 ， 这个才是最终有用的边线
 	get_left(data_stastics_l);
 	get_right(data_stastics_r);
 	//处理函数放这里
-
+  //cross_fill(bin_image,l_border, r_border, data_stastics_l, data_stastics_r, dir_l, dir_r, points_l, points_r);
 }
 //显示图像   
 if(mt9v03x_finish_flag)
@@ -550,11 +674,11 @@ if(mt9v03x_finish_flag)
 	//根据最终循环次数画出边界点
 	for (i = 0; i < data_stastics_l; i++)
 	{
-		//ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
+		ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
 	}
 	for (i = 0; i < data_stastics_r; i++)
 	{
-		//ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
+		ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
 	}
 	for (i = hightest; i < image_h-1; i++)
 	{
@@ -566,6 +690,7 @@ if(mt9v03x_finish_flag)
 		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
 	}
 }
+
 void picture_process(){
 		if(mt9v03x_finish_flag)
 { 

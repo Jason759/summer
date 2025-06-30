@@ -48,6 +48,7 @@ PID_t left={
 	  .minout=-100,
 	  .targ=0
 };
+
 PID_t right={
 	  .kp=0.08,
 	  .ki=0.09,
@@ -66,15 +67,15 @@ int main (void)
 	  Encoder_Init();
 	  ips200_clear();
 	  menu_init();
+	  pit_ms_init(TIM6_PIT, 100);
+	  interrupt_set_priority(TIM6_IRQn, 1);
 	  while(1)
     {   
 		showstr(35,280,"speedL:");
 		showstr(35,300,"speedR:");
 		showint32(90,280,left.actual,3);
 		showint32(90,300,right.actual,3);
-			showint32(120,300,image_thereshold,3);
 			system_delay_ms(20);
-//			 motor(30,30);
        show_process(NULL);
        system_delay_ms(20);       //运行菜单
 			 image_process();
