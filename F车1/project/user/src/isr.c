@@ -37,6 +37,7 @@
 #include "PID.h"
 #include "motor.h"
 #include "Encoder.h"
+#include "Tracking.h"
 extern int32 encoder1;
 extern int32 encoder2;
 extern PID_t left;
@@ -60,6 +61,7 @@ void TIM1_UP_IRQHandler (void)
 void TIM2_IRQHandler (void)
 {
     // 此处编写用户代码
+	  Tracking();
 		left.actual=Encoder1_get();
 		right.actual=Encoder2_get();
 	  PID_update(&left);
@@ -100,10 +102,7 @@ void TIM4_IRQHandler (void)
 void TIM5_IRQHandler (void)
 {
     // 此处编写用户代码
-			encoder1=encoder_get_count(TIM3_ENCODER);
-			encoder_clear_count(TIM3_ENCODER);
-			encoder2=encoder_get_count(TIM4_ENCODER);
-			encoder_clear_count(TIM4_ENCODER);
+	
     // 此处编写用户代码
     TIM5->SR &= ~TIM5->SR;                                                      // 清空中断状态
 }
@@ -115,7 +114,10 @@ void TIM5_IRQHandler (void)
 void TIM6_IRQHandler (void)
 {
     // 此处编写用户代码
-
+    	encoder1=encoder_get_count(TIM3_ENCODER);
+			encoder_clear_count(TIM3_ENCODER);
+			encoder2=encoder_get_count(TIM4_ENCODER);
+			encoder_clear_count(TIM4_ENCODER);
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }

@@ -39,6 +39,7 @@
 #include "Encoder.h"
 #include "auto_menu.h"
 #include "PID.h"
+extern uint8 image_thereshold;
 PID_t left={
 	  .kp=0.08,
 	  .ki=0.09,
@@ -65,13 +66,18 @@ int main (void)
 	  Encoder_Init();
 	  ips200_clear();
 	  menu_init();
-	  pit_ms_init(TIM2_PIT, 20);
-	  interrupt_set_priority(TIM2_IRQn, 0);
-	  interrupt_set_priority(TIM5_IRQn, 1);
 	  while(1)
-    {
+    {   
+		showstr(35,280,"speedL:");
+		showstr(35,300,"speedR:");
+		showint32(90,280,left.actual,3);
+		showint32(90,300,right.actual,3);
+			showint32(120,300,image_thereshold,3);
+			system_delay_ms(20);
+//			 motor(30,30);
        show_process(NULL);
        system_delay_ms(20);       //运行菜单
 			 image_process();
+			 //picture_process();
     }
 }

@@ -93,7 +93,7 @@ uint8 bin_image[image_h][image_w];//图像数组
 void turn_to_bin(void)
 {
   uint8 i,j;
- image_thereshold = otsuThreshold(original_image[0]);
+ image_thereshold =otsuThreshold(original_image[0]);
   for(i = 0;i<image_h;i++)
   {
       for(j = 0;j<image_w;j++)
@@ -470,11 +470,8 @@ void image_filter(uint8(*bin_image)[image_w])//形态学滤波，简单来说就
 			}
 			if (num <= threshold_min && bin_image[i][j] == 255)
 			{
-
 				bin_image[i][j] = 0;//黑
-
 			}
-
 		}
 	}
 
@@ -546,17 +543,18 @@ if (get_start_point(image_h - 2))//找到起点了，再执行八领域，没找
 //显示图像   
 if(mt9v03x_finish_flag)
 {
-	ips200_show_gray_image(0, 150, bin_image[0], MT9V03X_H, MT9V03X_W, MT9V03X_H,MT9V03X_W ,image_thereshold);
+	ips200_show_gray_image(0, 0, (const uint8*)bin_image, MT9V03X_W, MT9V03X_H, MT9V03X_W,MT9V03X_H ,image_thereshold);
+	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
 	mt9v03x_finish_flag=0;
 }
 	//根据最终循环次数画出边界点
 	for (i = 0; i < data_stastics_l; i++)
 	{
-		ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
+		//ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
 	}
 	for (i = 0; i < data_stastics_r; i++)
 	{
-		ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
+		//ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
 	}
 	for (i = hightest; i < image_h-1; i++)
 	{
@@ -568,11 +566,11 @@ if(mt9v03x_finish_flag)
 		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
 	}
 }
-/*void picture_process(){
-	image_thereshold=otsuThreshold(*original_image);
-	if(mt9v03x_finish_flag)
-{
-	ips200_show_gray_image(0, 150, original_image[0], MT9V03X_H, MT9V03X_W, MT9V03X_H,MT9V03X_W ,image_thereshold);
+void picture_process(){
+		if(mt9v03x_finish_flag)
+{ 
+//	//camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
+	ips200_show_gray_image(0,0, (const uint8 *)mt9v03x_image, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
 	mt9v03x_finish_flag=0;
 }
-}*/
+}

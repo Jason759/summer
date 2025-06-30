@@ -300,27 +300,27 @@ void center_menu()
 	uint8 index = p_unit->m_index[0];
 
 	if(first_in_page_flag)
-		showstr(DAD_INDEX(index,0),DAD_INDEX(index,1),MOUSE_LOOK);
+		showstr(DAD_INDEX(index,0),DAD_INDEX(index,1)+160,MOUSE_LOOK);
 	
 	if(button3||button4){
 		if(index==0){
-			showstr(DAD_INDEX(DAD_NUM-1,0),DAD_INDEX(DAD_NUM-1,1)," ");
-			showstr(DAD_INDEX(0,0) ,DAD_INDEX(0,1),MOUSE_LOOK);
-			showstr(DAD_INDEX(1,0) ,DAD_INDEX(1,1)," ");
+			showstr(DAD_INDEX(DAD_NUM-1,0),DAD_INDEX(DAD_NUM-1,1)+160," ");
+			showstr(DAD_INDEX(0,0) ,DAD_INDEX(0,1)+160,MOUSE_LOOK);
+			showstr(DAD_INDEX(1,0) ,DAD_INDEX(1,1)+160," ");
 		}else if(index==DAD_NUM-1){
-			showstr(DAD_INDEX(DAD_NUM-2,0),DAD_INDEX(DAD_NUM-2,1)," ");
-			showstr(DAD_INDEX(DAD_NUM-1,0),DAD_INDEX(DAD_NUM-1,1),MOUSE_LOOK);
-			showstr(DAD_INDEX(0,0) ,DAD_INDEX(0,1) ," ");			
+			showstr(DAD_INDEX(DAD_NUM-2,0),DAD_INDEX(DAD_NUM-2,1)+160," ");
+			showstr(DAD_INDEX(DAD_NUM-1,0),DAD_INDEX(DAD_NUM-1,1)+160,MOUSE_LOOK);
+			showstr(DAD_INDEX(0,0) ,DAD_INDEX(0,1)+160," ");			
 		}else{
-			showstr(DAD_INDEX(index-1,0),DAD_INDEX(index-1,1)," ");
-			showstr(DAD_INDEX(index  ,0),DAD_INDEX(index  ,1),MOUSE_LOOK);
-			showstr(DAD_INDEX(index+1,0),DAD_INDEX(index+1,1)," ");					
+			showstr(DAD_INDEX(index-1,0),DAD_INDEX(index-1,1)+160," ");
+			showstr(DAD_INDEX(index  ,0),DAD_INDEX(index  ,1)+160,MOUSE_LOOK);
+			showstr(DAD_INDEX(index+1,0),DAD_INDEX(index+1,1)+160," ");					
 		}
 	}else if((is_clear_flag==1&&(button1))||(begin_menu_flag)){
 		menu_unit* p = NULL;
 		p = p_unit;
 		for(uint8 i=0;i<DAD_NUM;i++){
-			showstr(DAD_INDEX(p->m_index[0],0)+MOUSE_DIS,DAD_INDEX(p->m_index[0],1),p->name);
+			showstr(DAD_INDEX(p->m_index[0],0)+MOUSE_DIS,DAD_INDEX(p->m_index[0],1)+160,p->name);
 			p = p->up;
 		}
 		begin_menu_flag = 0;
@@ -332,27 +332,27 @@ void assist_menu()
 {
 	uint8 index = p_unit->m_index[1];
 	if(first_in_page_flag)
-		showstr(SON_INDEX(index,0),SON_INDEX(index,1),MOUSE_LOOK);
+		showstr(SON_INDEX(index,0),SON_INDEX(index,1)+160,MOUSE_LOOK);
 	
 	if(button3||button4){
 		if(index==0){
-			showstr(SON_INDEX(p_unit->down->m_index[1],0),SON_INDEX(p_unit->down->m_index[1],1)," ");
-			showstr(SON_INDEX(0,0) ,SON_INDEX(0,1),MOUSE_LOOK);
-			showstr(SON_INDEX(1,0) ,SON_INDEX(1,1)," ");
+			showstr(SON_INDEX(p_unit->down->m_index[1],0),SON_INDEX(p_unit->down->m_index[1],1)+160," ");
+			showstr(SON_INDEX(0,0) ,SON_INDEX(0,1)+160,MOUSE_LOOK);
+			showstr(SON_INDEX(1,0) ,SON_INDEX(1,1)+160," ");
 		}else if(index==p_unit->back->enter->down->m_index[1]){
-			showstr(SON_INDEX(index-1,0),SON_INDEX(index-1,1)," ");
-			showstr(SON_INDEX(index,0),SON_INDEX(index,1),MOUSE_LOOK);
-			showstr(SON_INDEX(0,0) ,SON_INDEX(0,1) ," ");			
+			showstr(SON_INDEX(index-1,0),SON_INDEX(index-1,1)+160," ");
+			showstr(SON_INDEX(index,0),SON_INDEX(index,1)+160,MOUSE_LOOK);
+			showstr(SON_INDEX(0,0) ,SON_INDEX(0,1)+160," ");			
 		}else{
-			showstr(SON_INDEX(index-1,0),SON_INDEX(index-1,1)," ");
-			showstr(SON_INDEX(index  ,0),SON_INDEX(index  ,1),MOUSE_LOOK);
-			showstr(SON_INDEX(index+1,0),SON_INDEX(index+1,1)," ");					
+			showstr(SON_INDEX(index-1,0),SON_INDEX(index-1,1)+160," ");
+			showstr(SON_INDEX(index  ,0),SON_INDEX(index  ,1)+160,MOUSE_LOOK);
+			showstr(SON_INDEX(index+1,0),SON_INDEX(index+1,1)+160," ");					
 		}
 	}else if(is_clear_flag==1&&(button2)){
 		menu_unit* p = NULL;
 		p = p_unit;
 		for(uint8 i=0;i<SON_NUM;i++){
-			showstr(SON_INDEX(p->m_index[1],0)+MOUSE_DIS,SON_INDEX(p->m_index[1],1),p->name);
+			showstr(SON_INDEX(p->m_index[1],0)+MOUSE_DIS,SON_INDEX(p->m_index[1],1)+160,p->name);
 			p = p->up;
 		}
 	}				 
@@ -378,11 +378,11 @@ void change_value(param_set* param)
 			if(IS_OK)
 			{
 				*p_value +=	delta_x;
-				showfloat(0,(SON_NUM+1)*DIS_Y,*p_value,num,point_num);
+				showfloat(0,(SON_NUM+1)*DIS_Y+160,*p_value,num,point_num);
 			}
 			if(is_show_num){
-				showstr(0,(SON_NUM+1)*DIS_Y,"            ");
-				showfloat(0,(SON_NUM+1)*DIS_Y,*p_value,num,point_num);
+				showstr(0,(SON_NUM+1)*DIS_Y+160,"            ");
+				showfloat(0,(SON_NUM+1)*DIS_Y+160,*p_value,num,point_num);
 			}
 		}else if(type==TYPE_DOUBLE){
 			double *p_value;
@@ -390,11 +390,11 @@ void change_value(param_set* param)
 			if(IS_OK)
 			{
 				*p_value +=	(double)delta_x;
-				showfloat(0,(SON_NUM+1)*DIS_Y,*p_value,num,point_num);
+				showfloat(0,(SON_NUM+1)*DIS_Y+160,*p_value,num,point_num);
 			}
 			if(is_show_num){
-				showstr(0,(SON_NUM+1)*DIS_Y,"            ");
-				showfloat(0,(SON_NUM+1)*DIS_Y,*p_value,num,point_num);
+				showstr(0,(SON_NUM+1)*DIS_Y+160,"            ");
+				showfloat(0,(SON_NUM+1)*DIS_Y+160,*p_value,num,point_num);
 			}
 		}else if(type==TYPE_INT){
 			int *p_value;
@@ -402,11 +402,11 @@ void change_value(param_set* param)
 			if(IS_OK)
 			{
 				*p_value +=	(int)delta_x;
-				showint32(0,(SON_NUM+1)*DIS_Y,*p_value,num);
+				showint32(0,(SON_NUM+1)*DIS_Y+160,*p_value,num);
 			}
 			if(is_show_num){
-				showstr(0,(SON_NUM+1)*DIS_Y,"        ");
-				showint32(0,(SON_NUM+1)*DIS_Y,*p_value,num);
+				showstr(0,(SON_NUM+1)*DIS_Y+160,"        ");
+				showint32(0,(SON_NUM+1)*DIS_Y+160,*p_value,num);
 			}			
 		}else if(type==TYPE_UINT16){
 			uint16 *p_value;
@@ -414,11 +414,11 @@ void change_value(param_set* param)
 			if(IS_OK)
 			{
 				*p_value +=	(int)delta_x;
-				showuint16(0,(SON_NUM+1)*DIS_Y,*p_value,num);
+				showuint16(0,(SON_NUM+1)*DIS_Y+160,*p_value,num);
 			}
 			if(is_show_num){
-				showstr(0,(SON_NUM+1)*DIS_Y,"         ");
-				showuint16(0,(SON_NUM+1)*DIS_Y,*p_value,num);
+				showstr(0,(SON_NUM+1)*DIS_Y+160,"         ");
+				showuint16(0,(SON_NUM+1)*DIS_Y+160,*p_value,num);
 			}			
 		}else if(type==TYPE_UINT32){
 			uint32 *p_value;
@@ -426,11 +426,11 @@ void change_value(param_set* param)
 			if(IS_OK)
 			{
 				*p_value +=	(int)delta_x;
-				showuint32(0,(SON_NUM+1)*DIS_Y,*p_value,num);
+				showuint32(0,(SON_NUM+1)*DIS_Y+160,*p_value,num);
 			}
 			if(is_show_num){
-				showstr(0,(SON_NUM+1)*DIS_Y,"         ");
-				showuint32(0,(SON_NUM+1)*DIS_Y,*p_value,num);
+				showstr(0,(SON_NUM+1)*DIS_Y+160,"         ");
+				showuint32(0,(SON_NUM+1)*DIS_Y+160,*p_value,num);
 			}			
 		}
 	}
@@ -578,12 +578,12 @@ void day_night(){
 		if(IPS200_BGCOLOR==RGB565_WHITE){
 		    IPS200_BGCOLOR = RGB565_BLACK;
 		    ips200_set_color(RGB565_WHITE,RGB565_BLACK);
-		    showstr(0,(SON_NUM+1)*16,"BLACK");
+		    showstr(0,(SON_NUM+1)*16+160,"BLACK");
 		}
 		else if(IPS200_BGCOLOR==RGB565_BLACK){
 		    IPS200_BGCOLOR = RGB565_WHITE;
             ips200_set_color(RGB565_BLACK,RGB565_WHITE);
-			showstr(0,(SON_NUM+1)*16,"WHITE");
+			showstr(0,(SON_NUM+1)*16+160,"WHITE");
 		}
 	}
 }
@@ -593,17 +593,28 @@ void rand_color(){
         uint16 color;
         color = rand()%(32768*2);
         ips200_set_color(color,~color);
-        showstr(0,(SON_NUM+1)*16,"rand");
+        showstr(0,(SON_NUM+1)*16+160,"rand");
     }
 }
-//菜单空闲函数
-void NULL_FUN(){
-
-}
-
 extern  PID_t left;
 extern  PID_t right;
 extern  PID_t dir;
+//菜单空闲函数
+void go(){  	// go go go 出发了
+	if(IS_OK){
+		int32 a;
+	  pit_ms_init(TIM2_PIT, 20);     
+	  pit_ms_init(TIM6_PIT, 100);
+	  interrupt_set_priority(TIM2_IRQn, 0);
+	  interrupt_set_priority(TIM6_IRQn, 1);
+	}
+	}
+//菜单空闲函数
+void NULL_FUN(){
+	
+	
+}
+
 void UNIT_SET(){
 	//菜单单元调参参数初始化
     unit_param_set(&left.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kp");
@@ -619,7 +630,7 @@ void UNIT_SET(){
 
 void FUN_INIT(){
 	//菜单单元函数指针初始化
-	fun_init(NULL_FUN	,"NULL_FUN1");
+	fun_init(go	,"go");
 	fun_init(day_night	,"day_night");
 	fun_init(rand_color	,"rand_color");
 	fun_init(NULL_FUN	,"NULL_FUN2");

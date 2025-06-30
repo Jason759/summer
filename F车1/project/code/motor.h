@@ -1,7 +1,6 @@
 #ifndef motor_h
 #define motor_h
 
-#define MAX_DUTY            (50 )                                               // 最大 MAX_DUTY% 占空比
 #define DIR_L               (A0 )
 #define PWM_L               (TIM5_PWM_CH2_A1)
 
