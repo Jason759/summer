@@ -71,12 +71,9 @@ int main (void)
 	  interrupt_set_priority(TIM6_IRQn, 1);
 	  while(1)
     {   
-		showstr(35,280,"speedL:");
-		showstr(35,300,"speedR:");
-		showint32(90,280,left.actual,3);
-		showint32(90,300,right.actual,3);
-       show_process(NULL);
-			 image_process();
+		menu_adaptive_display();
+    show_process(NULL);
+		image_process();
 			 //picture_process();
     }
 }

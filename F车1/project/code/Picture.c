@@ -443,20 +443,23 @@ void get_right(uint16 total_R)
 函数名称：uint8 judge_border(uint16 total_L,uint16 total_R)
 功能说明：判断丢线
 参数说明：total_L,total_R  ：找到的点的总数
-函数返回：1,0,
+函数返回：1或0,
 备    注：
-example：get_right(data_stastics_r);
+example：judge_border(l_statics,r_statics)
  */
+uint8 outl=0,outr=0;
 uint8 judge_border(uint16 total_L,uint16 total_R){
-	uint8 i=0,outl=0,outr=0;
+	uint8 i=0;
+	outl=0,outr=0;
 	for(i=0;i< total_L;i++){
 		if(l_border[i]<3)  {outl++;}
 	}
 	for(i=0;i< total_R;i++){
-		if(r_border[i]>154)  {outr++;}
+		if(r_border[i]>image_w-4)  {outr++;}
 	}
 	if(outl>30&&outr>30)
 		 return 1;
+	
 	else 
 		 return 0;
 }
@@ -598,7 +601,7 @@ void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, flo
 void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16 total_num_l, uint16 total_num_r,
 							 uint16 *dir_l, uint16 *dir_r, uint16(*points_l)[2], uint16(*points_r)[2])
 {
-	uint8 i;
+	uint16 i;
 	uint8 flaga=0,flagb=0,flagc=0,flagd=0;
 	uint8 break_num_a = 0;
 	uint8 break_num_b= 0;
@@ -680,7 +683,6 @@ void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16
 功能说明：最终处理函数
 参数说明：无
 函数返回：无
-修改时间：2022年9月8日
 备    注：
 example： image_process();
  */
@@ -740,9 +742,6 @@ void image_display(){
 	if(mt9v03x_finish_flag)
 {
 	ips200_show_gray_image(0, 0, (const uint8*)bin_image, MT9V03X_W, MT9V03X_H, MT9V03X_W,MT9V03X_H ,image_thereshold);
-	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
-	mt9v03x_finish_flag=0;
-}
 	//根据最终循环次数画出边界点
 	for (i = 0; i < data_stastics_l; i++)
 	{
@@ -761,6 +760,10 @@ void image_display(){
 		ips200_draw_point(l_border[i], i, uesr_GREEN);//显示起点 显示左边线
 		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
 	}
+	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
+	mt9v03x_finish_flag=0;
+}
+	
 }
 void picture_process(){
 		if(mt9v03x_finish_flag)

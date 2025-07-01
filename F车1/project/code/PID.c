@@ -11,6 +11,19 @@ void PID_update(PID_t *p){
 		if(p->out<p->minout)
 		{p->out=p->minout;}
 }
+void increment_pid_update(PID_t *p) {
+   p->error2=p->error1;
+	 p->error1=p->error0;
+	 p->errorint+=p->error0;
+	 if(p->errorint>1000){p->errorint=1000;}
+   if(p->errorint<-1000){p->errorint=-1000;}
+	   p->out=p->kp*(p->error0-p->error1)+p->ki*p->errorint+p->kd*(p->error0-2*p->error1+p->error2);
+	 if(p->out>p->maxout)
+		{p->out=p->maxout;}
+	 if(p->out<p->minout)
+		{p->out=p->minout;}
+	
+}
 void PID_calculate(int error,PID_t *p){
 	  p->error1=p->error0;
 	  p->error0=error;

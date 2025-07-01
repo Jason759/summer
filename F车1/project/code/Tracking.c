@@ -13,7 +13,7 @@ PID_t dir={         //方向PID
 	  .minout=-100,
 };
 void Dev_calculate(){         //偏差计算
-	for(int i=0;0<image_h-i-2;i++){
+	for(int i=0;0<hightest;i++){
 		dev=dev+(94-center_line[image_h-i-1])*(1+i*fac);
 	}
 }
@@ -21,5 +21,5 @@ void Tracking(){              //循迹函数
 	Dev_calculate();
 	dir.error0=dev;
 	PID_update(&dir);
-	motor_set_traget(speed-dir.out,speed+dir.out);
+	motor_set_target(speed-dir.out,speed+dir.out);
 }

@@ -26,7 +26,9 @@ static menu_unit *p_unit	 	=NULL;//单元指针
 static menu_unit *p_unit_last 	=NULL;//上一次的单元指针
 
 static menu_unit *P_dad_head 	= NULL;
-
+extern  PID_t left;
+extern  PID_t right;
+extern  PID_t dir;
 uint8 DAD_NUM=1;
 
 #ifdef USE_STATIC_MENU
@@ -570,6 +572,17 @@ void menu_init()
     }
     #endif
 }
+void menu_adaptive_display(){
+	
+	  showstr(35,280,"speedL:");
+		showstr(35,300,"speedR:");
+		showint32(90,280,left.actual,3);
+		showint32(90,300,right.actual,3);
+		showstr(100,280,"TragL:");
+		showstr(100,300,"TragR:");
+		showint32(150,280,left.targ,3);
+		showint32(150,300,right.targ,3);
+}
 
 //更改夜间或白天模式
 static uint16 IPS200_BGCOLOR = RGB565_WHITE;
@@ -596,17 +609,11 @@ void rand_color(){
         showstr(0,(SON_NUM+1)*16+160,"rand");
     }
 }
-extern  PID_t left;
-extern  PID_t right;
-extern  PID_t dir;
 //菜单空闲函数
 void go(){  	// go go go 出发了
 	if(IS_OK){
-		int32 a;
 	  pit_ms_init(TIM2_PIT, 20);     
-	  pit_ms_init(TIM6_PIT, 100);
 	  interrupt_set_priority(TIM2_IRQn, 0);
-	  interrupt_set_priority(TIM6_IRQn, 1);
 	}
 	}
 //菜单空闲函数
@@ -627,7 +634,6 @@ void UNIT_SET(){
     unit_param_set(&dir.ki,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.ki");
     unit_param_set(&dir.kd,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.kd");
 }
-
 void FUN_INIT(){
 	//菜单单元函数指针初始化
 	fun_init(go	,"go");

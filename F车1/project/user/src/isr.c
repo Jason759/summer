@@ -61,11 +61,11 @@ void TIM1_UP_IRQHandler (void)
 void TIM2_IRQHandler (void)
 {
     // 此处编写用户代码
-	  Tracking();
+	  //Tracking();
 		left.actual=Encoder1_get();
 		right.actual=Encoder2_get();
-	  PID_update(&left);
-    PID_update(&right);
+	  increment_pid_update(&left);
+	  increment_pid_update(&right);
 		motor(left.out,right.out);
     // 此处编写用户代码
     TIM2->SR &= ~TIM2->SR;                                                      // 清空中断状态

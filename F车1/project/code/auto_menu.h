@@ -117,7 +117,7 @@ typedef struct MENU_UNIT
 #endif
 
 extern void menu_init(void);
-
+void menu_adaptive_display(void);
 void show_process(void *parameter);
 
 void fun_dad(uint8 index_dad,uint8 useless);

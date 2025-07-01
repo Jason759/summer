@@ -3,11 +3,11 @@
 typedef struct{
   float out;
   float kp,ki,kd;
-	float error0,error1,errorint;
+	float error0,error1,error2,errorint;
   float actual,targ;
 	float maxout,minout;
 }PID_t;
 void PID_update(PID_t*p);
 void PID_calculate(int error,PID_t *p);
-
+void increment_pid_update(PID_t *p);
 #endif

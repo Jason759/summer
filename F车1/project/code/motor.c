@@ -58,7 +58,7 @@ void motor(int left,int right){
 	Motor_SetRightSpeed(left);
 	Motor_SetLeftSpeed(right);
 }
-void motor_set_traget(int l,int r){
+void motor_set_target(int l,int r){
 	left.targ=l;
 	right.targ=r;
 }
