@@ -2,13 +2,12 @@
 #include "Picture.h"
 #include "PID.h"
 #include "motor.h"
-extern uint8 center_line[image_h];
-int speed;            //基准速度
+int speed=0;            //基准速度
 int dev=0;           //偏差
 float fac=0.01;         //近大远小导致的偏差系数
 PID_t dir={         //方向PID
-	  .kp=0.08,
-	  .ki=0.09,
+	  .kp=3,
+	  .ki=0,
 	  .kd=0,
 	  .maxout=100,
 	  .minout=-100,
@@ -22,5 +21,5 @@ void Tracking(){              //循迹函数
 	Dev_calculate();
 	dir.error0=dev;
 	PID_update(&dir);
-	motor(speed-dir.out,speed+dir.out);
+	motor_set_traget(speed-dir.out,speed+dir.out);
 }

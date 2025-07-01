@@ -2,6 +2,8 @@
 #include "PID.h"
 #include "motor.h"
 int8 duty = 0;
+extern PID_t left;
+extern PID_t right;
 /**
   * 函    数：直流电机初始化
   * 参    数：无
@@ -55,4 +57,8 @@ void Motor_SetRightSpeed(int8_t duty)
 void motor(int left,int right){
 	Motor_SetRightSpeed(left);
 	Motor_SetLeftSpeed(right);
+}
+void motor_set_traget(int l,int r){
+	left.targ=l;
+	right.targ=r;
 }

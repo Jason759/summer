@@ -75,9 +75,7 @@ int main (void)
 		showstr(35,300,"speedR:");
 		showint32(90,280,left.actual,3);
 		showint32(90,300,right.actual,3);
-			system_delay_ms(20);
        show_process(NULL);
-       system_delay_ms(20);       //运行菜单
 			 image_process();
 			 //picture_process();
     }

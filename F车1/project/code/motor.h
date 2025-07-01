@@ -8,5 +8,5 @@
 #define PWM_R               (TIM5_PWM_CH4_A3)
 void motor(int left,int right);
 void Motor_Init(void);
-
+void motor_set_traget(int l,int r);
 #endif

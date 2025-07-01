@@ -12,7 +12,7 @@ int16 limit_a_b(int16 x, int a, int b)
     if(x>b) x = b;
     return x;
 }
-
+void image_display();
 /*变量声明*/
 uint8 original_image[image_h][image_w];
 uint8 image_thereshold;//图像分割阈值
@@ -108,8 +108,8 @@ void turn_to_bin(void)
 
 
 /*
-函数名称：void get_start_point(uint8 start_row)
-功能说明：从最下方开始寻找两个边界的边界点作为八邻域循环的起始点
+函数名称：void get_start_point()
+功能说明：从最下方开始寻找两个边界的边界点作为八邻域循环的起始点,找不到一直找，直到找到
 参数说明：
 函数返回：无
 备    注：
@@ -152,8 +152,9 @@ uint8 get_start_point(void)
 			break;
 		}
 	}
-if(l_found&&r_found) {ips200_show_int(100,300,j,3);
-break;}	
+if(l_found&&r_found) { //找到退出
+
+   break;}	
 	}
    return 1;	
 	}
@@ -175,7 +176,6 @@ r_start_x				：右边起点横坐标
 r_start_y				：右边起点纵坐标
 hightest				：循环结束所得到的最高高度
 函数返回：无
-修改时间：2022年9月25日
 备    注：
 example：
 	search_l_r((uint16)USE_num,image,&data_stastics_l, &data_stastics_r,start_point_l[0],
@@ -375,7 +375,6 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 参数说明：
 total_L	：找到的点的总数
 函数返回：无
-修改时间：2022年9月25日
 备    注：
 example： get_left(data_stastics_l );
  */
@@ -415,7 +414,6 @@ void get_left(uint16 total_L)
 参数说明：
 total_R  ：找到的点的总数
 函数返回：无
-修改时间：2022年9月25日
 备    注：
 example：get_right(data_stastics_r);
  */
@@ -440,6 +438,27 @@ void get_right(uint16 total_R)
 		h--;
 		if (h == 0)break;//到最后一行退出
 	}
+}
+/*
+函数名称：uint8 judge_border(uint16 total_L,uint16 total_R)
+功能说明：判断丢线
+参数说明：total_L,total_R  ：找到的点的总数
+函数返回：1,0,
+备    注：
+example：get_right(data_stastics_r);
+ */
+uint8 judge_border(uint16 total_L,uint16 total_R){
+	uint8 i=0,outl=0,outr=0;
+	for(i=0;i< total_L;i++){
+		if(l_border[i]<3)  {outl++;}
+	}
+	for(i=0;i< total_R;i++){
+		if(r_border[i]>154)  {outr++;}
+	}
+	if(outl>30&&outr>30)
+		 return 1;
+	else 
+		 return 0;
 }
 //定义膨胀和腐蚀的阈值区间
 #define threshold_max	255*5//此参数可根据自己的需求调节
@@ -577,61 +596,85 @@ void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, flo
 //*     -<em>false</em> fail
 //*     -<em>true</em> succeed
 void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16 total_num_l, uint16 total_num_r,
-										 uint16 *dir_l, uint16 *dir_r, uint16(*points_l)[2], uint16(*points_r)[2])
+							 uint16 *dir_l, uint16 *dir_r, uint16(*points_l)[2], uint16(*points_r)[2])
 {
 	uint8 i;
-	uint8 break_num_l = 0;
-	uint8 break_num_r = 0;
+	uint8 flaga=0,flagb=0,flagc=0,flagd=0;
+	uint8 break_num_a = 0;
+	uint8 break_num_b= 0;
+	uint8 break_num_c= 0;
+	uint8 break_num_d= 0;
 	uint8 start, end;
 	float slope_l_rate = 0, intercept_l = 0;
-	//出十字
-	for (i = 1; i < total_num_l; i++)
+	uint8 lnum6=0;
+	uint8 rnum6=0;
+	for (i = 0; i < total_num_l; i++)
 	{
-		if (dir_l[i - 1] == 4 && dir_l[i] == 4 && dir_l[i + 3] == 6 && dir_l[i + 5] == 6 && dir_l[i + 7] == 6)   //
+		if (dir_l[i] == 6 )    //生长方向为六的点
 		{
-			break_num_l = points_l[i][1];//传递y坐标
+		    lnum6++;    
+		}
+		if(dir_l[i]==6&&dir_l[i+1]==4){ //判断拐点是否存在:
+		          flagc++;
+		}
+	}
+	for (i = 0; i < total_num_r; i++)
+	{
+		if (dir_r[i] == 6 )
+		{
+		    rnum6++;    
+		}
+		if(dir_r[i]==6&&dir_r[i+1]==4){
+		          flagd++;
+		}
+	}
+	if(lnum6>10&&rnum6>10&&flagc&&flagd){
+	for (i = 2; i < total_num_l; i++)
+	{
+		if (dir_l[i - 2] == 6 && dir_l[i-1] == 6 && dir_l[i] == 6 && dir_l[i+1]!=6)   //找拐点c
+		{
+			break_num_c = points_l[i][1];//传递y坐标
 			break;
 		}
 	}
-	for (i = 1; i < total_num_r; i++)
+	for (i = 2; i < total_num_l; i++)
 	{
-		if (dir_r[i - 1] == 4 && dir_r[i] == 4 && dir_r[i + 3] == 6 && dir_r[i + 5] == 6 && dir_r[i + 7] == 6)
+		if (dir_r[i - 2] == 6 && dir_r[i-1] == 6 && dir_r[i] == 6 && dir_r[i+1]!=6)   //找拐点d
 		{
-			break_num_r = points_r[i][1];//传递y坐标
+			break_num_d = points_l[i][1];//传递y坐标
 			break;
 		}
 	}
-	if (break_num_l&&break_num_r&&image[image_h - 2][4] && image[image_h - 1][image_w - 4])//两边生长方向都符合条件
+	
+	if (break_num_c&&break_num_d&&image[image_h - 1][4] && image[image_h - 1][image_w - 4])//两边生长方向都符合条件
 	{
 		//计算斜率
-		start = break_num_l - 15;
+		start = break_num_c - 15;
 		start = limit_a_b(start, 0, image_h);
-		end = break_num_l - 5;
+		end = break_num_c - 5;
 		calculate_s_i(start, end, l_border, &slope_l_rate, &intercept_l);
 		//printf("slope_l_rate:%d\nintercept_l:%d\n", slope_l_rate, intercept_l);
-		for (i = break_num_l - 5; i < image_h - 1; i++)
+		for (i = break_num_c - 5; i < image_h - 1; i++)
 		{
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
 
 		//计算斜率
-		start = break_num_r - 15;//起点
+		start = break_num_d - 15;//起点
 		start = limit_a_b(start, 0, image_h);//限幅
-		end = break_num_r - 5;//终点
+		end = break_num_d - 5;//终点
 		calculate_s_i(start, end, r_border, &slope_l_rate, &intercept_l);
 		//printf("slope_l_rate:%d\nintercept_l:%d\n", slope_l_rate, intercept_l);
-		for (i = break_num_r - 5; i < image_h - 1; i++)
+		for (i = break_num_d - 5; i < image_h - 1; i++)
 		{
 			r_border[i] = slope_l_rate * (i)+intercept_l;
 			r_border[i] = limit_a_b(r_border[i], border_min, border_max);
 		}
-
-
 	}
 
 }
-
+}
 /*
 函数名称：void image_process(void)
 功能说明：最终处理函数
@@ -662,10 +705,12 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 	get_left(data_stastics_l);
 	get_right(data_stastics_r);
 	//处理函数放这里
-  //cross_fill(bin_image,l_border, r_border, data_stastics_l, data_stastics_r, dir_l, dir_r, points_l, points_r);
+//	if(judge_border(data_stastics_l,data_stastics_r)){
+//  //cross_fill(bin_image,l_border, r_border, data_stastics_l, data_stastics_r, dir_l, dir_r, points_l, points_r);
+//}
 }
 //显示图像   
-if(mt9v03x_finish_flag)
+    if(mt9v03x_finish_flag)
 {
 	ips200_show_gray_image(0, 0, (const uint8*)bin_image, MT9V03X_W, MT9V03X_H, MT9V03X_W,MT9V03X_H ,image_thereshold);
 	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
@@ -690,7 +735,33 @@ if(mt9v03x_finish_flag)
 		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
 	}
 }
-
+void image_display(){
+	uint8 i;
+	if(mt9v03x_finish_flag)
+{
+	ips200_show_gray_image(0, 0, (const uint8*)bin_image, MT9V03X_W, MT9V03X_H, MT9V03X_W,MT9V03X_H ,image_thereshold);
+	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
+	mt9v03x_finish_flag=0;
+}
+	//根据最终循环次数画出边界点
+	for (i = 0; i < data_stastics_l; i++)
+	{
+		ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
+	}
+	for (i = 0; i < data_stastics_r; i++)
+	{
+		ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
+	}
+	for (i = hightest; i < image_h-1; i++)
+	{
+		center_line[i] = (l_border[i] + r_border[i]) >> 1;//求中线
+		//求中线最好最后求，不管是补线还是做状态机，全程最好使用一组边线，中线最后求出，不能干扰最后的输出
+		//当然也有多组边线的找法，但是个人感觉很繁琐，不建议
+		ips200_draw_point(center_line[i], i, uesr_GREEN);//显示起点 显示中线	
+		ips200_draw_point(l_border[i], i, uesr_GREEN);//显示起点 显示左边线
+		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
+	}
+}
 void picture_process(){
 		if(mt9v03x_finish_flag)
 { 

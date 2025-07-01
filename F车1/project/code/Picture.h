@@ -2,7 +2,7 @@
 #ifndef __PICTURE_H
 #define __PICTURE_H
 #define image_h	120//图像高度
-#define image_w	188//图像宽度
+#define image_w	158//图像宽度
 #define white_pixel	255
 #define black_pixel	0
 #define uesr_RED     0XF800    //红色
@@ -11,6 +11,7 @@
 #define bin_jump_num	1//跳过的点数
 #define border_max	image_w-2 //边界最大值
 #define border_min	1	//边界最小值	
+extern uint8 center_line[image_h];
 extern uint8 original_image[image_h][image_w];
 extern uint8 bin_image[image_h][image_w];//图像数组
 int adaptiveThreshold(int *image);
