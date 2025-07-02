@@ -32,7 +32,6 @@
 * 日期              作者                备注
 * 2022-08-10        Teternal            first version
 ********************************************************************************************************************/
-
 #include "zf_common_headfile.h"
 #include "Picture.h"
 #include "motor.h"
@@ -41,8 +40,8 @@
 #include "PID.h"
 extern uint8 image_thereshold;
 PID_t left={
-	  .kp=0.08,
-	  .ki=0.09,
+	  .kp=0.3,
+	  .ki=0.02,
 	  .kd=0,
 	  .maxout=100,
 	  .minout=-100,
@@ -50,13 +49,14 @@ PID_t left={
 };
 
 PID_t right={
-	  .kp=0.08,
-	  .ki=0.09,
+	  .kp=0.3,
+	  .ki=0.02,
 	  .kd=0,
 	  .maxout=100,
 	  .minout=-100,
     .targ=0
 };
+int showflag=-1;
 int main (void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
@@ -70,10 +70,10 @@ int main (void)
 	  pit_ms_init(TIM6_PIT, 100);
 	  interrupt_set_priority(TIM6_IRQn, 1);
 	  while(1)
-    {   
+    {  
 		menu_adaptive_display();
     show_process(NULL);
-		image_process();
+		//image_process();
 			 //picture_process();
     }
 }

@@ -61,7 +61,7 @@ void TIM1_UP_IRQHandler (void)
 void TIM2_IRQHandler (void)
 {
     // 此处编写用户代码
-	  //Tracking();
+	  Tracking();
 		left.actual=Encoder1_get();
 		right.actual=Encoder2_get();
 	  increment_pid_update(&left);

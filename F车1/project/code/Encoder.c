@@ -11,5 +11,5 @@ int32 Encoder1_get(){
 }
 int32 Encoder2_get(){
 	
-	return encoder2/50;
+	return -encoder2/50;
 }

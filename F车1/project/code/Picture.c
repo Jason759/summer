@@ -1,5 +1,6 @@
 #include "zf_common_headfile.h"
 #include "Picture.h"
+#include "math.h"
 int my_abs(int value)
 {
 if(value>=0) return value;
@@ -32,65 +33,83 @@ void Get_image(uint8(*mt9v03x_image)[image_w])
     }
 }
 
-uint8 otsuThreshold(uint8 *image) //找阈值——大津法(已优化-遇到递减直接退出)
+uint8 otsuThreshold(uint8 *image)   //注意计算阈值的一定要是原图像
 {
 #define GrayScale 256
-	  int i;
-    const uint8 *data = image;
-    int HistGram[GrayScale] = {0};
-	  int Amount =image_w*image_h/4;
-    int PixelBack = 0;   //前景像素点数
-    int PixelIntegralBack = 0;  
-    int PixelIntegral = 0;
-    int PixelIntegralFore = 0;
-    int PixelFore = 0;
-    double OmegaBack=0, OmegaFore=0, MicroBack=0, MicroFore=0, SigmaB=0, Sigma=0; // 类间方差;
-    int MinValue=0, MaxValue=0;
-    int Threshold = 0;
-    for (i = 0; i <MT9V03X_H; i+=2)
+    int Pixel_Max=0;
+    int Pixel_Min=255;
+    uint16 width = MT9V03X_W;
+    uint16 height = MT9V03X_H;
+    int pixelCount[GrayScale];
+    float pixelPro[GrayScale];
+    int i, j, pixelSum = width * height/4;
+    uint8 threshold=0,last_threshold = 0;
+    uint8* data = image;  //指向像素数据的指针
+    for (i = 0; i < GrayScale; i++)
     {
-        for(int j=0;j<MT9V03X_W;j+=2){
-        HistGram[data[i*MT9V03X_W+j]]++; //统计每个灰度值的个数信息
+        pixelCount[i] = 0;
+        pixelPro[i] = 0;
+    }
+
+    uint32 gray_sum=0;
+    //统计灰度级中每个像素在整幅图像中的个数
+    for (i = 0; i < height; i+=2)
+    {
+        for (j = 0; j < width; j+=2)
+        {
+            pixelCount[(int)data[i * width + j]]++;  //将当前的点的像素值作为计数数组的下标
+            gray_sum+=(int)data[i * width + j];       //灰度值总和
+            if(data[i * width + j]>Pixel_Max)   Pixel_Max=data[i * width + j];
+            if(data[i * width + j]<Pixel_Min)   Pixel_Min=data[i * width + j];
         }
     }
-    for (MinValue = 0; MinValue < 256 && HistGram[MinValue] == 0; MinValue++) ;        //获取最小灰度的值
-    for (MaxValue = 255; MaxValue > MinValue && HistGram[MinValue] == 0; MaxValue--) ; //获取最大灰度的值
 
-    if (MaxValue == MinValue)
+    //计算每个像素值的点在整幅图像中的比例
+
+    for (i = Pixel_Min; i < Pixel_Max; i++)
     {
-        return MaxValue;          // 图像中只有一个颜色
+        pixelPro[i] = (float)pixelCount[i] / pixelSum;
+
     }
-    if (MinValue + 1 == MaxValue)
+
+    //遍历灰度级[0,255]
+    float w0, w1, u0tmp, u1tmp, u0, u1, u, deltaTmp, deltaMax = 0;
+
+    w0 = w1 = u0tmp = u1tmp = u0 = u1 = u = deltaTmp = 0;
+    for (j = Pixel_Min; j < Pixel_Max; j++)
     {
-        return MinValue;      // 图像中只有二个颜色
+
+        w0 += pixelPro[j];  //背景部分每个灰度值的像素点所占比例之和   即背景部分的比例
+        u0tmp += j * pixelPro[j];  //背景部分 每个灰度值的点的比例 *灰度值
+
+        w1=1-w0;
+        u1tmp=gray_sum/pixelSum-u0tmp;
+
+        u0 = u0tmp / w0;              //背景平均灰度
+        u1 = u1tmp / w1;              //前景平均灰度
+        u = u0tmp + u1tmp;            //全局平均灰度
+        deltaTmp = (float)(w0 *w1* (u0 - u1)* (u0 - u1)) ;
+        if (deltaTmp > deltaMax)
+        {
+            deltaMax = deltaTmp;
+            threshold = j;
+        }
+        if (deltaTmp < deltaMax)
+        {
+            break;
+        }
+
     }
-    PixelIntegral = 0;
-    for (i= MinValue; i <= MaxValue; i+=2)
-    {
-        PixelIntegral += HistGram[i] * i;//灰度值总数
-    }
-    SigmaB = -1;
-    for (i = MinValue; i < MaxValue; i++)
-    {
-          PixelFore = PixelFore + HistGram[i];    //前景像素点数
-          PixelBack = Amount - PixelFore;         //背景像素点数
-          OmegaFore = (double)PixelFore / Amount;//前景像素百分比
-          OmegaBack = (double)PixelBack / Amount;//背景像素百分比
-          PixelIntegralFore += HistGram[i] * i;  //前景灰度值
-          PixelIntegralBack = PixelIntegral - PixelIntegralBack;//背景灰度值
-          MicroFore = (double)PixelIntegralFore / PixelFore;//前景灰度百分比
-          MicroBack = (double)PixelIntegralBack / PixelBack;//背景灰度百分比
-          Sigma = OmegaBack * OmegaFore * (MicroFore - MicroBack) * (MicroFore - MicroBack);//类间方差
-          if (Sigma > SigmaB)//遍历最大的类间方差g
-          {
-              SigmaB = Sigma;
-              Threshold = (int)i;
-          }
-					if(Sigma<SigmaB){break;}
-						
-    }
-   return Threshold;
+
+    if(threshold>90 && threshold<130)
+        last_threshold = threshold;
+    else
+        threshold = last_threshold;
+
+    return threshold;
 }
+
+
 uint8 bin_image[image_h][image_w];//图像数组
 void turn_to_bin(void)
 {
@@ -105,8 +124,41 @@ void turn_to_bin(void)
       }
   }
 }
+//  @brief      逆透视知三点求形成的角度(以左上角为原点形成坐标系)
+//  @param      Ax，Ay      下边点
+//  @param      Bx，By      要求角度的一点
+//  @param      Cx，Cy      上边点
+//  @return
+//  @since      v1.0
+//  Sample usage:
+//-------------------------------------------------------------------------------------------------------------------
+float hd[3][3] ={{-0.436025, 0.000000, 21.365217}, {0.424457, 0.487500, -22.048370}, {0.018944, -0.000000, 0.071739}};
+//x=[18,18,69,69]  % 依次为A、B、D、C在摄像头获取的照片中的的纵坐标
+//y=[70,121,70,121] % 依次为A、B、D、C在摄像头获取的照片中的的横坐标
+float Get_angle(float Ax, float Ay, float Bx, float By, float Cx, float Cy)
+{
 
+    float BA = 0.00;//向量BA的模
+    float BC = 0.00;
+    float SBA_BC = 0.00;//向量点乘的值
+    float angle = 0.00;
 
+    float AX=((hd[0][0] * Ax + hd[0][1] * Ay + hd[0][2])/(hd[2][0] * Ax + hd[2][1] * Ay + hd[2][2]));
+    float AY=((hd[1][0] * Ax + hd[1][1] * Ay + hd[1][2])/(hd[2][0] * Ax + hd[2][1] * Ay + hd[2][2]));
+    float BX=((hd[0][0] * Bx + hd[0][1] * By + hd[0][2])/(hd[2][0] * Bx + hd[2][1] * By + hd[2][2]));
+    float BY=((hd[1][0] * Bx + hd[1][1] * By + hd[1][2])/(hd[2][0] * Bx + hd[2][1] * By + hd[2][2]));
+    float CX=((hd[0][0] * Cx + hd[0][1] * Cy + hd[0][2])/(hd[2][0] * Cx + hd[2][1] * Cy + hd[2][2]));
+    float CY=((hd[1][0] * Cx + hd[1][1] * Cy + hd[1][2])/(hd[2][0] * Cx + hd[2][1] * Cy + hd[2][2]));
+
+    BA = sqrt((AX-BX)*(AX-BX)+(AY-BY)*(AY-BY));
+    BC = sqrt((CX-BX)*(CX-BX)+(CY-BY)*(CY-BY));
+
+    SBA_BC = (AX-BX)*(CX-BX)+(AY-BY)*(CY-BY);
+
+    angle =  acos(SBA_BC*1.00/(BA*BC));
+
+    return angle*57.3;
+}
 /*
 函数名称：void get_start_point()
 功能说明：从最下方开始寻找两个边界的边界点作为八邻域循环的起始点,找不到一直找，直到找到
@@ -161,7 +213,7 @@ if(l_found&&r_found) { //找到退出
 
 /*
 函数名称：void search_l_r(uint16 break_flag, uint8(*image)[image_w],uint16 *l_stastic, uint16 *r_stastic,
-							uint8 l_start_x, uint8 l_start_y, uint8 r_start_x, uint8 r_start_y,uint8*hightest)
+							uint8 l_start_x, uint8 start_point_l[1], uint8 r_start_x, uint8 start_point_r[1],uint8*hightest)
 
 功能说明：八邻域正式开始找右边点的函数，输入参数有点多，调用的时候不要漏了，这个是左右线一次性找完。
 参数说明：
@@ -171,9 +223,9 @@ break_flag_r			：最多需要循环的次数
 *l_stastic				：统计左边数据，用来输入初始数组成员的序号和取出循环次数
 *r_stastic				：统计右边数据，用来输入初始数组成员的序号和取出循环次数
 l_start_x				：左边起点横坐标
-l_start_y				：左边起点纵坐标
+start_point_l[1]				：左边起点纵坐标
 r_start_x				：右边起点横坐标
-r_start_y				：右边起点纵坐标
+start_point_r[1]				：右边起点纵坐标
 hightest				：循环结束所得到的最高高度
 函数返回：无
 备    注：
@@ -191,7 +243,7 @@ uint16 dir_l[(uint16)USE_num] = { 0 };//用来存储左边生长方向
 uint16 data_stastics_l = 0;//统计左边找到点的个数
 uint16 data_stastics_r = 0;//统计右边找到点的个数
 uint8 hightest = 0;//最高点
-void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, uint16 *r_stastic, uint8 l_start_x, uint8 l_start_y, uint8 r_start_x, uint8 r_start_y, uint8*hightest)
+void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, uint16 *r_stastic, uint8 l_start_x, uint8 l_start_y, uint8 r_start_x, uint8 r_start_ys, uint8*hightest)
 {
 
 	uint8 i = 0, j = 0;
@@ -227,9 +279,9 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 
 	//第一次更新坐标点  将找到的起点值传进来
 	center_point_l[0] = l_start_x;//x
-	center_point_l[1] = l_start_y;//y
+	center_point_l[1] = start_point_l[1];//y
 	center_point_r[0] = r_start_x;//x
-	center_point_r[1] = r_start_y;//y
+	center_point_r[1] = start_point_r[1];//y
 
 		//开启邻域循环
 	while (break_flag--)
@@ -369,6 +421,83 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 	*r_stastic = r_data_statics;
 
 }
+/*---------------------------------------------------------------
+ 【函    数】get_turning_point
+ 【功    能】拐点检测
+ 【参    数】无
+ 【返 回 值】
+ 【注意事项】
+ ----------------------------------------------------------------*/
+int16 L_corner_flag = 0;//左拐点存在标志
+int16 L_corner_row = 0;//左拐点所在行
+int16 L_corner_col = 0;//左拐点所在列
+int L_corner_angle = 0;//左拐点角度
+int16 R_corner_flag = 0;//右拐点存在标志
+int16 R_corner_row = 0;//右拐点所在行
+int16 R_corner_col = 0;//右拐点所在列
+int R_corner_angle = 0;//右拐点角度
+uint8 enable_L_corner=1,enable_R_corner=1;
+void get_turning_point(void)
+{
+    L_corner_flag = 0;// 初始化变量
+    L_corner_row = 0;
+    L_corner_col = 0;
+    L_corner_angle = 0;
+    if(enable_L_corner) //如果使能搜索左拐点
+    {
+        if(data_stastics_l> 9&&start_point_l[1]>=image_h/2)
+        {
+            for(int i = 0; i<data_stastics_l-9;i++)
+            {
+                if(points_l[i+8][1]>5)
+                {
+                    if((points_l[i][0] - points_l[i + 4][0]) * (points_l[i + 8][0] - points_l[i + 4][0]) +
+                       (points_l[i][1] - points_l[i + 4][1]) * (points_l[i + 8][1] - points_l[i + 4][1]) >= 0) //初步确认为锐角或者直角 向量法
+                    {
+                        L_corner_angle = Get_angle(points_l[i][0], points_l[i][1], points_l[i + 4][0], points_l[i + 4][1], points_l[i + 8][0], points_l[i + 8][1]); //求角度
+                        if(points_l[i+4][0]>points_l[i+8][0]&&L_corner_angle>=28&&L_corner_angle<=110)
+                        {
+                            L_corner_flag = 1;
+                            L_corner_row = points_l[i+4][1];
+                            L_corner_col = points_l[i+4][0];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    R_corner_flag = 0;//初始化变量
+    R_corner_row = 0;
+    R_corner_col = 0;
+    R_corner_angle = 0;
+    if(enable_R_corner)    //如果使能搜索右拐点
+    {
+        if(data_stastics_r > 9&&start_point_r[1]>=image_h/2)
+        {
+            for(int i = 0; i<data_stastics_r-9;i++)
+            {
+                if(points_r[i+8][1]>5)
+                {
+                    if((points_r[i][0] - points_r[i + 4][0]) * (points_r[i + 8][0] - points_r[i + 4][0]) +
+                    (points_r[i][1] - points_r[i + 4][1]) * (points_r[i + 8][1] - points_r[i + 4][1]) >= 0) //初步确认为锐角或者直角 向量法
+                    {
+                        R_corner_angle = Get_angle(points_r[i][0], points_r[i][1], points_r[i + 4][0], points_r[i + 4][1], points_r[i + 8][0], points_r[i + 8][1]); //求角度
+                        if(points_r[i+8][0]>points_r[i+4][0]&&R_corner_angle>=28&&R_corner_angle<=110)
+                        {
+                            R_corner_flag = 1;
+                            R_corner_row = points_r[i+4][1];
+                            R_corner_col = points_r[i+4][0];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 /*
 函数名称：void get_left(uint16 total_L)
 功能说明：从八邻域边界里提取需要的边线，找的是最靠近中间的点
@@ -598,6 +727,7 @@ void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, flo
 //* @return 返回说明
 //*     -<em>false</em> fail
 //*     -<em>true</em> succeed
+
 void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16 total_num_l, uint16 total_num_r,
 							 uint16 *dir_l, uint16 *dir_r, uint16(*points_l)[2], uint16(*points_r)[2])
 {
