@@ -576,14 +576,15 @@ void menu_init()
 }
 void menu_adaptive_display(){
 	
-	  showstr(35,280,"speedL:");
-		showstr(35,300,"speedR:");
-		showint32(90,280,left.actual,3);
-		showint32(90,300,right.actual,3);
-		showstr(120,280,"TragL:");
-		showstr(120,300,"TragR:");
-		showint32(170,280,left.targ,3);
-		showint32(170,300,right.targ,3);
+	  showstr(40,280,"speedL:");
+		showstr(40,300,"speedR:");
+		showint32(95,280,left.actual,3);
+		showint32(95,300,right.actual,3);
+		showstr(125,280,"TragL:");
+		showstr(125,300,"TragR:");
+		showint32(175,280,left.targ,3);
+		showint32(175,300,right.targ,3);
+	  showint32(200,300,dir.actual,3);
 	  system_delay_ms(20);
 }
 
@@ -615,6 +616,7 @@ void rand_color(){
 //菜单空闲函数
 void go(){  	// go go go 出发了
 	if(IS_OK){
+		
 	  pit_ms_init(TIM2_PIT, 20);     
 	  interrupt_set_priority(TIM2_IRQn, 0);
 	}
@@ -635,10 +637,10 @@ void NULL_FUN(){
 void UNIT_SET(){
 	//菜单单元调参参数初始化
     unit_param_set(&left.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kp");
-    unit_param_set(&left.ki,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.ki");
+    unit_param_set(&left.ki,TYPE_FLOAT ,0.001  ,1  ,3,NORMAL_PAR,"left.ki");
     unit_param_set(&left.kd,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kd");
     unit_param_set(&right.kp,TYPE_FLOAT ,0.01 ,1  ,2,NORMAL_PAR,"right.kp");
-    unit_param_set(&right.ki,TYPE_FLOAT ,0.01 ,1  ,2,NORMAL_PAR,"right.ki");
+    unit_param_set(&right.ki,TYPE_FLOAT ,0.001 ,1  ,3,NORMAL_PAR,"right.ki");
 	  unit_param_set(&right.kd,TYPE_FLOAT ,0.01 ,1  ,2,NORMAL_PAR,"right.kd");
 	  unit_param_set(&dir.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.kp");
     unit_param_set(&dir.ki,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.ki");

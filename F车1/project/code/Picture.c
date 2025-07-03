@@ -124,15 +124,15 @@ void turn_to_bin(void)
       }
   }
 }
-//  @brief      逆透视知三点求形成的角度(以左上角为原点形成坐标系)
-//  @param      Ax，Ay      下边点
-//  @param      Bx，By      要求角度的一点
-//  @param      Cx，Cy      上边点
-//  @return
-//  @since      v1.0
-//  Sample usage:
-//-------------------------------------------------------------------------------------------------------------------
-float hd[3][3] ={{-0.436025, 0.000000, 21.365217}, {0.424457, 0.487500, -22.048370}, {0.018944, -0.000000, 0.071739}};
+/*
+函数名称：Get_angle(float Ax, float Ay, float Bx, float By, float Cx, float Cy)
+功能说明：获取逆透视后的角度，即真实角度
+参数说明：
+函数返回：无
+备    注：
+example：  get_start_point(image_h-2)
+ */
+float hd[3][3] ={{0.222140,-0.155125,10.441998},{0.004990,0.011549,7.435414},{0.000135,-0.001700,0.237177}};
 //x=[18,18,69,69]  % 依次为A、B、D、C在摄像头获取的照片中的的纵坐标
 //y=[70,121,70,121] % 依次为A、B、D、C在摄像头获取的照片中的的横坐标
 float Get_angle(float Ax, float Ay, float Bx, float By, float Cx, float Cy)
@@ -421,13 +421,14 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 	*r_stastic = r_data_statics;
 
 }
-/*---------------------------------------------------------------
- 【函    数】get_turning_point
- 【功    能】拐点检测
- 【参    数】无
- 【返 回 值】
- 【注意事项】
- ----------------------------------------------------------------*/
+/*
+函数名称：get_turning_point(void)；
+功能说明：找拐点
+参数说明：
+函数返回：无
+备    注：
+example：  
+*/
 int16 L_corner_flag = 0;//左拐点存在标志
 int16 L_corner_row = 0;//左拐点所在行
 int16 L_corner_col = 0;//左拐点所在列
@@ -898,8 +899,8 @@ void image_display(){
 void picture_process(){
 		if(mt9v03x_finish_flag)
 { 
-//	//camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
-	ips200_show_gray_image(0,0, (const uint8 *)mt9v03x_image, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
+	camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
+//	ips200_show_gray_image(0,0, (const uint8 *)mt9v03x_image, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
 	mt9v03x_finish_flag=0;
 }
 }

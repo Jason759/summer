@@ -40,25 +40,26 @@
 #include "PID.h"
 extern uint8 image_thereshold;
 PID_t left={
-	  .kp=0.3,
-	  .ki=0.02,
+	  .kp=0.5,   //0.5
+	  .ki=0.015,  //0.015
 	  .kd=0,
-	  .maxout=100,
-	  .minout=-100,
+	  .maxout=50,
+	  .minout=-50,
 	  .targ=0
 };
 
 PID_t right={
-	  .kp=0.3,
-	  .ki=0.02,
+	  .kp=0.5,   //0.5
+	  .ki=0.015,  //0.015
 	  .kd=0,
-	  .maxout=100,
-	  .minout=-100,
+	  .maxout=50,
+	  .minout=-50,
     .targ=0
 };
 int showflag=-1;
 int main (void)
-{
+{   
+	  bluetooth_ch9141_init();
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
 	  ips200_init(IPS200_TYPE_SPI);	//初始化ISP200
@@ -74,6 +75,6 @@ int main (void)
 		menu_adaptive_display();
     show_process(NULL);
 		//image_process();
-			 //picture_process();
+			 picture_process();
     }
 }

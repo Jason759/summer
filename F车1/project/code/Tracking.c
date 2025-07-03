@@ -2,23 +2,19 @@
 #include "Picture.h"
 #include "PID.h"
 #include "motor.h"
-uint8 basespeed=50;            //基准速度
+int8 basespeed=50;            //基准速度
 int dev=0;           //偏差
-float fac=0.01;         //近大远小导致的偏差系数
+extern uint8 center_line[];
 PID_t dir={         //方向PID
 	  .kp=3,
 	  .ki=0,
 	  .kd=0,
 	  .maxout=100,
 	  .minout=-100,
+	 .targ=93
 };
-void Dev_calculate(){         //偏差计算
-	for(int i=0;0<hightest;i++){
-		dev=dev+(94-center_line[image_h-i-1])*(1+i*fac);
-	}
-}
-void Tracking(){              //循迹函数
-	Dev_calculate();
+void Tracking(){    	//循迹函数
+	dir.actual=center_line[90];   //预瞄点，速度越快，前瞻有大
 	dir.error0=dev;
 	PID_update(&dir);
 	motor_set_target(basespeed-dir.out,basespeed+dir.out);
