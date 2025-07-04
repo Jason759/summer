@@ -30,7 +30,7 @@ extern  PID_t left;
 extern  PID_t right;
 extern  PID_t dir;
 extern uint8 basespeed;
-extern int showflag;
+extern uint8 showflag;
 uint8 DAD_NUM=1;
 
 #ifdef USE_STATIC_MENU
@@ -575,7 +575,7 @@ void menu_init()
     #endif
 }
 void menu_adaptive_display(){
-	
+	  showstr(0,200,"showmode:");
 	  showstr(40,280,"speedL:");
 		showstr(40,300,"speedR:");
 		showint32(95,280,left.actual,3);
@@ -587,7 +587,7 @@ void menu_adaptive_display(){
 	  showint32(200,300,dir.actual,3);
 	  system_delay_ms(20);
 }
-
+//菜单函数
 //更改夜间或白天模式
 static uint16 IPS200_BGCOLOR = RGB565_WHITE;
 void day_night(){
@@ -613,7 +613,6 @@ void rand_color(){
         showstr(0,(SON_NUM+1)*16+160,"rand");
     }
 }
-//菜单空闲函数
 void go(){  	// go go go 出发了
 	if(IS_OK){
 		
@@ -621,19 +620,22 @@ void go(){  	// go go go 出发了
 	  interrupt_set_priority(TIM2_IRQn, 0);
 	}
 	}
-void show_speed(){
-	 if(IS_OK){	 
-		 showflag=-showflag;
-	 }
-	
-	
+void show_gray(void){
+	 showflag=1;
+	 showstr(0,80,"gray");
 }
-//菜单空闲函数
+void show_proc(void){
+	 showflag=2;
+	 showstr(0,80,"process");
+}
+void show_rep(void){
+	 showflag=3;
+	 showstr(0,80,"rep");
+}
+//空闲函数
 void NULL_FUN(){
-	
-	
-}
 
+}
 void UNIT_SET(){
 	//菜单单元调参参数初始化
     unit_param_set(&left.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kp");
@@ -645,12 +647,15 @@ void UNIT_SET(){
 	  unit_param_set(&dir.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.kp");
     unit_param_set(&dir.ki,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.ki");
     unit_param_set(&dir.kd,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.kd");
-    unit_param_set(&basespeed,TYPE_INT ,5  ,2  ,2,NORMAL_PAR,"basespeed");
+    unit_param_set(&basespeed,TYPE_INT ,10  ,3  ,2,NORMAL_PAR,"basespeed1");
+	  unit_param_set(&basespeed,TYPE_INT ,20  ,3  ,2,NORMAL_PAR,"basespeed1");
+	  unit_param_set(&basespeed,TYPE_INT ,50 ,3  ,2,NORMAL_PAR,"basespeed2");
 }
 void FUN_INIT(){
 	//菜单单元函数指针初始化
 	fun_init(go	,"go");
 	fun_init(day_night	,"day_night");
 	fun_init(rand_color	,"rand_color");
-	fun_init(NULL_FUN	,"NULL");
+	fun_init(show_gray	,"show_gray");
+	fun_init(show_proc	,"show_proc");
 }

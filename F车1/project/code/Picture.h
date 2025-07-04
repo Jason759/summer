@@ -11,6 +11,8 @@
 #define bin_jump_num	1//跳过的点数
 #define border_max	image_w-2 //边界最大值
 #define border_min	1	//边界最小值	
+#define RESULT_ROW 100//结果图行列
+#define RESULT_COL 114
 extern uint8 center_line[image_h];
 extern uint8 hightest;
 extern uint8 original_image[image_h][image_w];
@@ -19,5 +21,7 @@ int adaptiveThreshold(int *image);
 uint8 otsuThreshold(uint8 *image);
 void picture_process();
 extern void image_process(void); //直接在中断或循环里调用此程序就可以循环执行了
-
+void ImagePerspective_Init(void);
+void rep_show();
+void ImagePerspective_Init(void);
 #endif

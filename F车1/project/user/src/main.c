@@ -39,9 +39,10 @@
 #include "auto_menu.h"
 #include "PID.h"
 extern uint8 image_thereshold;
+uint8 showflag=0;
 PID_t left={
-	  .kp=0.5,   //0.5
-	  .ki=0.015,  //0.015
+	  .kp=0.3,   //0.3
+	  .ki=0.02,  //0.02
 	  .kd=0,
 	  .maxout=50,
 	  .minout=-50,
@@ -49,32 +50,34 @@ PID_t left={
 };
 
 PID_t right={
-	  .kp=0.5,   //0.5
-	  .ki=0.015,  //0.015
+	  .kp=0.3,   //0.3
+	  .ki=0.02,  //0.02
 	  .kd=0,
 	  .maxout=50,
 	  .minout=-50,
     .targ=0
 };
-int showflag=-1;
 int main (void)
 {   
-	  bluetooth_ch9141_init();
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
 	  ips200_init(IPS200_TYPE_SPI);	//初始化ISP200
     mt9v03x_init();
+	  //ImagePerspective_Init();   //逆透视初始化
 	  Motor_Init();
 	  Encoder_Init();
-	  ips200_clear();
 	  menu_init();
 	  pit_ms_init(TIM6_PIT, 100);
 	  interrupt_set_priority(TIM6_IRQn, 1);
 	  while(1)
-    {  
+    { 
 		menu_adaptive_display();
     show_process(NULL);
-		//image_process();
-			 picture_process();
+	switch(showflag){
+		case 1:  image_process(); break;
+	  case 2:  picture_process(); break;
+		default: break;
+	}
+	//rep_show(); //显示逆透视图像
     }
 }

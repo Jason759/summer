@@ -15,10 +15,9 @@ void increment_pid_update(PID_t *p) {
    p->error2=p->error1;
 	 p->error1=p->error0;
 	 p->error0=p->targ-p->actual;
-	 p->errorint+=p->error0;
 	 if(p->errorint>2000){p->errorint=2000;}
    if(p->errorint<-2000){p->errorint=-2000;}
-	   p->out=p->kp*(p->error0-p->error1)+p->ki*p->errorint+p->kd*(p->error0-2*p->error1+p->error2);
+	   p->out+=p->kp*(p->error0-p->error1)+p->ki*p->error0+p->kd*(p->error0-2*p->error1+p->error2);
 	 if(p->out>p->maxout)
 		{p->out=p->maxout;}
 	 if(p->out<p->minout)
