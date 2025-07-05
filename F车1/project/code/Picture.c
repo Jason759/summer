@@ -19,7 +19,7 @@ uint8 original_image[image_h][image_w];
 uint8 image_thereshold;//图像分割阈值
 void Get_image(uint8(*mt9v03x_image)[image_w])
 {
-#define use_num		1	//1就是不压缩，2就是压缩一倍	
+#define use_num	 1	//1就是不压缩，2就是压缩一倍	
 	uint8 i = 0, j = 0, row = 0, line = 0;
     for (i = 0; i < image_h; i += use_num)          //
     {
@@ -187,7 +187,6 @@ uint8 get_start_point(void)
 		start_point_l[1] = j;//y
 		if (bin_image[j][i] == 255 && bin_image[j][i - 1] == 255&&bin_image[j][i-2]==0)
 		{
-			//printf("找到左边起点image[%d][%d]\n", j,i-2);
 			l_found = 1;
 			break;
 		}
@@ -199,7 +198,7 @@ uint8 get_start_point(void)
 		start_point_r[1] = j;//y
 		if (bin_image[j][i] == 255 && bin_image[j][i + 1] == 255&&bin_image[j][i + 2]==0)
 		{
-			//printf("找到右边起点image[%d][%d]\n",start_row, i);
+			//sprintf("找到右边起点image[%d][%d]\n",start_row, i);
 			r_found = 1;
 			break;
 		}
@@ -348,27 +347,25 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 			||(points_l[l_data_statics-1][0] == points_l[l_data_statics - 2][0] && points_l[l_data_statics-1][0] == points_l[l_data_statics - 3][0]
 				&& points_l[l_data_statics-1][1] == points_l[l_data_statics - 2][1] && points_l[l_data_statics-1][1] == points_l[l_data_statics - 3][1]))
 		{
-			//printf("三次进入同一个点，退出\n");
+			
 			break;
 		}
 		if (my_abs(points_r[r_data_statics][0] - points_l[l_data_statics - 1][0]) < 2
 			&& my_abs(points_r[r_data_statics][1] - points_l[l_data_statics - 1][1] < 2)
 			)
 		{
-			//printf("\n左右相遇退出\n");	
 			*hightest = (points_r[r_data_statics][1] + points_l[l_data_statics - 1][1]) >> 1;//取出最高点
-			//printf("\n在y=%d处退出\n",*hightest);
+			
 			break;
 		}
 		if ((points_r[r_data_statics][1] < points_l[l_data_statics - 1][1]))
 		{
-			printf("\n如果左边比右边高了，左边等待右边\n");	
 			continue;//如果左边比右边高了，左边等待右边
 		}
 		if (dir_l[l_data_statics - 1] == 7
 			&& (points_r[r_data_statics][1] > points_l[l_data_statics - 1][1]))//左边比右边高且已经向下生长了
 		{
-			//printf("\n左边开始向下了，等待右边，等待中... \n");
+
 			center_point_l[0] = points_l[l_data_statics - 1][0];//x
 			center_point_l[1] = points_l[l_data_statics - 1][1];//y
 			l_data_statics--;
@@ -392,7 +389,6 @@ void search_l_r(uint16 break_flag, uint8(*image)[image_w], uint16 *l_stastic, ui
 				temp_r[index_r][1] = search_filds_r[(i)][1];
 				index_r++;//索引加一
 				dir_r[r_data_statics - 1] = (i);//记录生长方向
-				//printf("dir[%d]:%d\n", r_data_statics - 1, dir_r[r_data_statics - 1]);
 			}
 			if (index_r)
 			{
@@ -469,7 +465,8 @@ int16 R_corner_col2 = 0;//右拐点所在列
 int R_corner_angle = 0;//右拐点角度
 uint8 enable_L_corner=1,enable_R_corner=1;
 void get_turning_point(void)
-{
+{    ips200_show_int(190,20,L_corner_row1,3);
+	   ips200_show_int(190,40,L_corner_row2,3);
     L_corner_flag = 0;// 初始化变量
     L_corner_row1 = 0;
     L_corner_col1 = 0;
@@ -513,7 +510,7 @@ void get_turning_point(void)
     R_corner_angle = 0;
     if(enable_R_corner)    //如果使能搜索右拐点
     {    R_lose(0,data_stastics_r);
-			if(data_stastics_r > 9&&r_lose_num<=image_h&&r_lose_num>20)
+			if(data_stastics_r > 9&&r_lose_num<=image_h/2&&r_lose_num>20)
         {
             for(int i = 0; i<data_stastics_r-9;i++)
             {
@@ -523,13 +520,13 @@ void get_turning_point(void)
                     (points_r[i][1] - points_r[i + 4][1]) * (points_r[i + 8][1] - points_r[i + 4][1]) >= 0) //初步确认为锐角或者直角 向量法
                     {
                         R_corner_angle = Get_angle(points_r[i][0], points_r[i][1], points_r[i + 4][0], points_r[i + 4][1], points_r[i + 8][0], points_r[i + 8][1]); //求角度
-                        if(points_r[i+8][0]>points_r[i+4][0]&&R_corner_angle>=28&&R_corner_angle<=110&&R_corner_flag==0)
+                        if(points_r[i+8][0]>points_r[i+4][0]&&R_corner_angle>=60&&R_corner_angle<=100&&R_corner_flag==0)
                         {
                             R_corner_flag++;
                             R_corner_row1 = points_r[i+4][1];
                             R_corner_col1 = points_r[i+4][0];
                         }
-												else if(points_l[i+4][0]>points_l[i+8][0]&&L_corner_angle>=28&&L_corner_angle<=110&&R_corner_flag==1){
+												else if(points_l[i+4][0]>points_l[i+8][0]&&L_corner_angle>=50&&L_corner_angle<=100&&R_corner_flag==1){
 													  R_corner_flag++;
                             R_corner_row2 = points_r[i+4][1];
                             R_corner_col2 = points_r[i+4][0];
@@ -567,7 +564,7 @@ void get_left(uint16 total_L)
 	//左边
 	for (j = 0; j < total_L; j++)
 	{
-		//printf("%d\n", j);
+		//sprintf("%d\n", j);
 		if (points_l[j][1] == h)
 		{
 			l_border[h] = points_l[j][0]+1;
@@ -610,6 +607,51 @@ void get_right(uint16 total_R)
 		h--;
 		if (h == 0)break;//到最后一行退出
 	}
+}
+uint16 L_A,L_P,L_V;
+uint8 L_duan_A(){
+	uint16 i,count=0,flag=0;
+	L_A=0;
+ for(i=1;i<data_stastics_l-1;i++){
+	 if(points_l[i-1][0]>points_l[i][0]&&points_l[i][0]<points_l[i+1][0]){
+		 L_A=i;
+		 flag=1;
+		 break;
+	 }
+ }
+ if(flag==1){
+    return 1;
+ }
+ else return 0;
+}
+uint8 L_duan_P(){
+	uint16 i,count=0,flag=0;
+	L_P=0;
+ for(i=1;i<data_stastics_l-1;i++){
+	 if(l_border[i-1]<l_border[i]&&l_border[i]>l_border[i+1]){
+		 L_P=i;
+		 flag=1;
+	 }
+ }
+ if(flag==1){
+    return 1;
+ }
+ else return 0;
+}
+uint8 L_duan_V(){
+	uint16 i,count=0,flag=0;
+	L_A=0;
+ for(i=1;i<data_stastics_l-1;i++){
+	 if(points_l[i-1][0]<points_l[i][0]&&points_l[i][0]>points_l[i+1][0]){
+		 L_V=i;
+		 flag=1;
+		 break;
+	 }
+ }
+ if(flag==1){
+    return 1;
+ }
+ else return 0;
 }
 //定义膨胀和腐蚀的阈值区间
 #define threshold_max	255*5//此参数可根据自己的需求调节
@@ -727,6 +769,7 @@ void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, flo
 		y_average = (float)(ysum / num);
 
 	}
+	
 
 	/*计算斜率*/
 	*slope_rate = Slope_Calculate(start, end, border);//斜率
@@ -753,34 +796,100 @@ void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16
 	uint16 i;
 	uint8 start, end;
 	float slope_l_rate = 0, intercept_l = 0;
-  get_turning_point();
-	if (L_corner_flag&&R_corner_flag&&image[image_h - 1][4] && image[image_h - 1][image_w - 4])//两边生长方向都符合条件
+	uint16 L_corner_col=0;
+	uint16 L_corner_row=0;
+	uint16 R_corner_col=0;
+	uint16 R_corner_row=0;
+	get_turning_point();
+	if(L_corner_flag==1&&R_corner_flag==1){
+		L_corner_row=L_corner_row1;
+		R_corner_row=R_corner_row1;
+	}
+	if(L_corner_flag==2&&R_corner_flag==2){
+		L_corner_row=L_corner_row2;
+		R_corner_row=R_corner_row2;
+	}
+	if ((L_corner_flag&&R_corner_flag&&image[image_h - 1][4] && image[image_h - 1][image_w - 4])||(L_corner_flag==2&&R_corner_flag==2))//两边生长方向都符合条件
 	{
-		//计算斜率
-		start = L_corner_row2 - 15;
+		//计算斜率		
+		start = L_corner_row - 15;
 		start = limit_a_b(start, 0, image_h);
-		end = L_corner_row2 - 5;
+		end = L_corner_row - 5;
 		calculate_s_i(start, end, l_border, &slope_l_rate, &intercept_l);
-		//printf("slope_l_rate:%d\nintercept_l:%d\n", slope_l_rate, intercept_l);
-		for (i = L_corner_row2 - 5; i < image_h - 1; i++)
+		for (i = L_corner_row - 5; i < image_h - 1; i++)
 		{
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
 
 		//计算斜率
-		start = R_corner_row2 - 15;//起点
+		start = R_corner_row - 15;//起点
 		start = limit_a_b(start, 0, image_h);//限幅
-		end = R_corner_row2 - 5;//终点
+		end = R_corner_row - 5;//终点
 		calculate_s_i(start, end, r_border, &slope_l_rate, &intercept_l);
-		//printf("slope_l_rate:%d\nintercept_l:%d\n", slope_l_rate, intercept_l);
-		for (i = R_corner_row2 - 5; i < image_h - 1; i++)
+	
+		for (i = R_corner_row - 5; i < image_h - 1; i++)
 		{
 			r_border[i] = slope_l_rate * (i)+intercept_l;
 			r_border[i] = limit_a_b(r_border[i], border_min, border_max);
 		}
 	}
-
+}
+uint8 status=0;
+uint8 flagv;
+void leftcircle()
+{
+	uint16 start,end,i;
+	float slope_l_rate = 0, intercept_l = 0;
+	R_lose(0,data_stastics_r);
+	L_lose(0,data_stastics_l);
+	if(status==0&&L_duan_A()&&L_duan_P()&&r_lose_num<10&&l_lose_num>20){
+	 slope_l_rate=(points_l[L_A][1]-L_P)/(l_border[L_P]-points_l[L_A][0]);
+	 intercept_l=points_l[L_A][1]-points_l[L_A][0]*slope_l_rate;        ;
+		for (i = points_l[L_P][1]; i < L_P; i++)
+		{
+			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
+		}
+		status=1;
+	}
+	if(status==1&&L_duan_P()&&L_duan_A()==0&&r_lose_num<5&&l_lose_num>20){
+	
+	  slope_l_rate=(image_h-1-L_P)/(l_border[L_P]-0);
+	  intercept_l=L_P-l_border[L_P]*slope_l_rate;  
+		for (i =0; i < L_P; i++)
+		{
+			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
+		}
+		status=2;
+	}
+	if(status==2&&L_duan_V()&&l_lose_num<10&&r_lose_num<10){   //拉线入环
+	 slope_l_rate=(image_h-1-L_V)/(start_point_r[0]-l_border[L_V]);
+	  intercept_l=L_V-l_border[L_V]*slope_l_rate;  
+		for (i = L_corner_row1; i < L_corner_row2; i++)
+		{
+			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
+		}
+		status=3;
+	}
+	if(status==3&&l_lose_num<10&&r_lose_num<10){
+		status=4;
+	}
+	if(status==4&&L_duan_V()&&l_lose_num>30&&r_lose_num<10){   //拉线出环
+		slope_l_rate=(image_h-1-L_V)/(l_border[L_V]-0);
+	  intercept_l=L_V-l_border[L_V]*slope_l_rate;  
+		for (i = L_corner_row1; i < L_corner_row2; i++)
+		{
+			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
+		}
+		status=5;
+	}
+	if(status==5&&l_lose_num<10&&r_lose_num<10){   //回到普通赛道
+		status=0;
+	}
 }
 /*
 函数名称：void image_process(void)
@@ -798,7 +907,7 @@ uint8 hightest = 0;//定义一个最高行，tip：这里的最高指的是y值�
 Get_image(mt9v03x_image);
 turn_to_bin();
 /*提取赛道边界*/
-//image_filter(bin_image);//滤波
+image_filter(bin_image);//滤波
 image_draw_rectan(bin_image);//预处理
 //清零
 data_stastics_l = 0;
@@ -811,15 +920,14 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 	get_left(data_stastics_l);
 	get_right(data_stastics_r);
 	//处理函数放这里
-    cross_fill(bin_image,l_border, r_border, data_stastics_l, data_stastics_r, dir_l, dir_r, points_l, points_r);
+	  //leftcircle();
+    //cross_fill(bin_image,l_border, r_border, data_stastics_l, data_stastics_r, dir_l, dir_r, points_l, points_r);
 }
-
 //显示图像   
     if(mt9v03x_finish_flag)
 {
 	ips200_show_gray_image(0, 0, (const uint8*)bin_image, MT9V03X_W, MT9V03X_H, MT9V03X_W,MT9V03X_H ,image_thereshold);
 	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
-	mt9v03x_finish_flag=0;
 
 	//根据最终循环次数画出边界点
 	for (i = 0; i < data_stastics_l; i++)
@@ -839,6 +947,7 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 		ips200_draw_point(l_border[i], i, uesr_GREEN);//显示起点 显示左边线
 		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
 	}
+	mt9v03x_finish_flag=0;
 }
 }
 //
@@ -897,7 +1006,7 @@ void picture_process(){
 		if(mt9v03x_finish_flag)
 { 
 	//camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
-//	ips200_show_gray_image(0,0, (const uint8 *)mt9v03x_image, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
+	ips200_show_gray_image(0,0, (const uint8 *)mt9v03x_image, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
 	mt9v03x_finish_flag=0;
 }
 }

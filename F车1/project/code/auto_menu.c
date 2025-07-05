@@ -575,7 +575,6 @@ void menu_init()
     #endif
 }
 void menu_adaptive_display(){
-	  showstr(0,200,"showmode:");
 	  showstr(40,280,"speedL:");
 		showstr(40,300,"speedR:");
 		showint32(95,280,left.actual,3);
@@ -621,16 +620,22 @@ void go(){  	// go go go 出发了
 	}
 	}
 void show_gray(void){
-	 showflag=1;
-	 showstr(0,80,"gray");
+	if(IS_OK){
+	 showflag=2;
+	 showstr(190,0,"gray");
+	}
 }
 void show_proc(void){
-	 showflag=2;
-	 showstr(0,80,"process");
+	if(IS_OK){
+	 showflag=1;
+	 showstr(190,0,"pro");
+	}
 }
-void show_rep(void){
-	 showflag=3;
-	 showstr(0,80,"rep");
+void off_show(){
+	if(IS_OK){
+	showflag=0;
+	clear();
+	}
 }
 //空闲函数
 void NULL_FUN(){
@@ -658,4 +663,5 @@ void FUN_INIT(){
 	fun_init(rand_color	,"rand_color");
 	fun_init(show_gray	,"show_gray");
 	fun_init(show_proc	,"show_proc");
+	fun_init(off_show	,"off_show");
 }

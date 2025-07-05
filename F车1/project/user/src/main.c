@@ -61,7 +61,6 @@ int main (void)
 {   
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
-	  ips200_init(IPS200_TYPE_SPI);	//初始化ISP200
     mt9v03x_init();
 	  //ImagePerspective_Init();   //逆透视初始化
 	  Motor_Init();
@@ -75,7 +74,7 @@ int main (void)
     show_process(NULL);
 	switch(showflag){
 		case 1:  image_process(); break;
-	  case 2:  picture_process(); break;
+//	  case 2:  picture_process(); break;
 		default: break;
 	}
 	//rep_show(); //显示逆透视图像

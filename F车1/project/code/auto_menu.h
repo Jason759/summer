@@ -2,15 +2,15 @@
 #define _AUTO_MENU_H
 #include "zf_common_headfile.h"
 
-//#define DEBUG_PRINTF
+//#define DEBUG_sprintf
 #define _pid  struct controller
 
 //#define MENU_USE_RTT
 
-#ifdef DEBUG_PRINTF
-	#define	debug_printf(format, ...) printf(format, ##__VA_ARGS__)
+#ifdef DEBUG_sprintf
+	#define	debug_sprintf(format, ...) sprintf(format, ##__VA_ARGS__)
 #else
-	#define	debug_printf(format, ...)
+	#define	debug_sprintf(format, ...)
 #endif
 
 #define MAP_INIT_BEGIN		(0x01<<0)

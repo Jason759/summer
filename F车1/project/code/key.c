@@ -105,7 +105,6 @@ void button_entry(void *parameter)
 		key4_state = gpio_get_level(KEY_4);
 //		key4_state = 1;
 		
-//		printf("key:%d %d %d %d\n",key1_state,key2_state,key3_state,key4_state);
 
 		
 		//³¤°´¼ì²â
