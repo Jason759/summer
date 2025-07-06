@@ -138,7 +138,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -330,14 +330,14 @@
             <uGnu>1</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
-            <v6LangP>3</v6LangP>
+            <v6LangP>5</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>-Oz -ffunction-sections -fdata-sections</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath>..\user\inc;..\code;..\..\libraries\zf_common;..\..\libraries\zf_device;..\..\libraries\zf_driver;..\..\libraries\sdk;..\..\libraries\sdk\CMSIS\Include;..\..\libraries\sdk\drivers;..\..\libraries\components\fatfs\source</IncludePath>
@@ -374,7 +374,8 @@
             <ScatterFile>..\..\libraries\sdk\mdk\linker\mm32f3277g_flash.scf</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc></Misc>
+            <Misc>--remove --cpu=Cortex-M3 --library_type=microlib
+</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>

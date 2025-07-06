@@ -101,10 +101,10 @@ uint8 otsuThreshold(uint8 *image)   //注意计算阈值的一定要是原图像
 
     }
 
-    if(threshold>90 && threshold<130)
-        last_threshold = threshold;
-    else
-        threshold = last_threshold;
+//    if(threshold>90 && threshold<130)
+//        last_threshold = threshold;
+//    else
+//        threshold = last_threshold;
 
     return threshold;
 }
@@ -465,8 +465,8 @@ int16 R_corner_col2 = 0;//右拐点所在列
 int R_corner_angle = 0;//右拐点角度
 uint8 enable_L_corner=1,enable_R_corner=1;
 void get_turning_point(void)
-{    ips200_show_int(190,20,L_corner_row1,3);
-	   ips200_show_int(190,40,L_corner_row2,3);
+{    
+	   
     L_corner_flag = 0;// 初始化变量
     L_corner_row1 = 0;
     L_corner_col1 = 0;
@@ -790,8 +790,7 @@ void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, flo
 //*     -<em>false</em> fail
 //*     -<em>true</em> succeed
 
-void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16 total_num_l, uint16 total_num_r,
-							 uint16 *dir_l, uint16 *dir_r, uint16(*points_l)[2], uint16(*points_r)[2])
+void cross_fill()
 {
 	uint16 i;
 	uint8 start, end;
@@ -809,7 +808,7 @@ void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16
 		L_corner_row=L_corner_row2;
 		R_corner_row=R_corner_row2;
 	}
-	if ((L_corner_flag&&R_corner_flag&&image[image_h - 1][4] && image[image_h - 1][image_w - 4])||(L_corner_flag==2&&R_corner_flag==2))//两边生长方向都符合条件
+	if ((L_corner_flag&&R_corner_flag&&bin_image[image_h - 1][4] && bin_image[image_h - 1][image_w - 4])||(L_corner_flag==2&&R_corner_flag==2))//两边生长方向都符合条件
 	{
 		//计算斜率		
 		start = L_corner_row - 15;
@@ -836,7 +835,6 @@ void cross_fill(uint8(*image)[image_w], uint8 *l_border, uint8 *r_border, uint16
 	}
 }
 uint8 status=0;
-uint8 flagv;
 void leftcircle()
 {
 	uint16 start,end,i;
@@ -920,35 +918,13 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 	get_left(data_stastics_l);
 	get_right(data_stastics_r);
 	//处理函数放这里
-	  //leftcircle();
-    //cross_fill(bin_image,l_border, r_border, data_stastics_l, data_stastics_r, dir_l, dir_r, points_l, points_r);
+	  leftcircle();
+    //cross_fill();
 }
-//显示图像   
-    if(mt9v03x_finish_flag)
-{
-	ips200_show_gray_image(0, 0, (const uint8*)bin_image, MT9V03X_W, MT9V03X_H, MT9V03X_W,MT9V03X_H ,image_thereshold);
-	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
-
-	//根据最终循环次数画出边界点
-	for (i = 0; i < data_stastics_l; i++)
-	{
-		ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
-	}
-	for (i = 0; i < data_stastics_r; i++)
-	{
-		ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
-	}
-	for (i = hightest; i < image_h-1; i++)
+for (i = hightest; i < image_h-1; i++)
 	{
 		center_line[i] = (l_border[i] + r_border[i]) >> 1;//求中线
-		//求中线最好最后求，不管是补线还是做状态机，全程最好使用一组边线，中线最后求出，不能干扰最后的输出
-		//当然也有多组边线的找法，但是个人感觉很繁琐，不建议
-		ips200_draw_point(center_line[i], i, uesr_GREEN);//显示起点 显示中线	
-		ips200_draw_point(l_border[i], i, uesr_GREEN);//显示起点 显示左边线
-		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
 	}
-	mt9v03x_finish_flag=0;
-}
 }
 //
 // Created by RUPC on 2022/9/20.
@@ -1001,6 +977,34 @@ void rep_show()        //显示逆透视后的图像
             ips200_show_gray_image(0,0,show[0],RESULT_COL,RESULT_ROW,RESULT_COL,RESULT_ROW,0);
             mt9v03x_finish_flag= 0;
         }
+}
+void image_show(){
+	uint16 i;
+	//显示图像   
+    if(mt9v03x_finish_flag)
+{
+	ips200_show_gray_image(0, 0, (const uint8*)bin_image, MT9V03X_W, MT9V03X_H, MT9V03X_W,MT9V03X_H ,image_thereshold);
+	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
+
+	//根据最终循环次数画出边界点
+	for (i = 0; i < data_stastics_l; i++)
+	{
+		ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
+	}
+	for (i = 0; i < data_stastics_r; i++)
+	{
+		ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
+	}
+	for (i = hightest; i < image_h-1; i++)
+	{
+		//求中线最好最后求，不管是补线还是做状态机，全程最好使用一组边线，中线最后求出，不能干扰最后的输出
+		//当然也有多组边线的找法，但是个人感觉很繁琐，不建议
+		ips200_draw_point(center_line[i], i, uesr_GREEN);//显示起点 显示中线	
+		ips200_draw_point(l_border[i], i, uesr_GREEN);//显示起点 显示左边线
+		ips200_draw_point(r_border[i], i, uesr_GREEN);//显示起点 显示右边线
+	}
+	mt9v03x_finish_flag=0;
+}
 }
 void picture_process(){
 		if(mt9v03x_finish_flag)

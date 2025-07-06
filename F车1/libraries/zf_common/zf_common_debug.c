@@ -297,7 +297,7 @@ void debug_interrupr_handler (void)
 
 #endif
 
-//-------------------------------------------------------------------------     // printf 重定向 此部分不允许用户更改
+//-------------------------------------------------------------------------     // sprintf 重定向 此部分不允许用户更改
 #if defined(__ICCARM__)
 #define PUTCHAR_PROTOTYPE int32_t fputc (int32_t ch, FILE *f)
 #define GETCHAR_PROTOTYPE int32_t fgetc (FILE *f)
@@ -345,7 +345,7 @@ int fgetc(FILE *f)
     return data;
 }
 #endif
-//-------------------------------------------------------------------------     // printf 重定向 此部分不允许用户更改
+//-------------------------------------------------------------------------     // sprintf 重定向 此部分不允许用户更改
 
 //-------------------------------------------------------------------------------------------------------------------
 // 函数简介     启用断言
@@ -444,7 +444,7 @@ void debug_log_handler (uint8 pass, char *str, char *file, int line)
         if(zf_debug_init_flag)
         {
             debug_output("Log message", file, line, str);
-//            printf("Log message from %s line %d :\"%s\".\r\n", file, line, str);
+//            sprintf("Log message from %s line %d :\"%s\".\r\n", file, line, str);
         }
     }while(0);
 }

@@ -1,7 +1,7 @@
 #include "PID.h"
 void PID_update(PID_t *p){
 		p->error1=p->error0;
-		p->error0=p->targ-p->actual;
+		p->error0=(p->targ-p->actual)*0.6;
 	  p->errorint+=p->error0;
 		if(p->errorint>1000){p->errorint=1000;}
     if(p->errorint<-1000){p->errorint=-1000;}

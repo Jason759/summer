@@ -2,14 +2,8 @@
 #include "auto_menu.h"
 #include "key.h"
 #include "PID.h"
-//按键信号量及按键反馈信号量
-#ifdef  MENU_USE_RTT
-extern rt_sem_t key1_sem;
-extern rt_sem_t key2_sem;
-extern rt_sem_t key3_sem;
-extern rt_sem_t key4_sem;
-extern rt_sem_t button_feedback_sem;
-#endif
+#include "motor.h"
+
 /*-------------------按键--------------------
                     button1返回
                     button2确定
@@ -246,8 +240,7 @@ void index_xy_init()
     p_index_xy_dad = my_index;
     p_index_xy_son = my_index+DAD_NUM*2;
 #else
-	p_index_xy_dad =(uint8*)malloc(sizeof(uint8)*DAD_NUM*2);
-	p_index_xy_son =(uint8*)malloc(sizeof(uint8)*SON_NUM*2);
+	
 #endif
 	uint8 half;
 	half = (DAD_NUM+1)/2;
@@ -556,23 +549,6 @@ void menu_init()
 
     /*---------------字符串索引初始化----------------*/
     index_xy_init();
-
-    /*-----------------配置flash---------------*/
-    #ifdef USE_FLASH
-    flash_init_wz();
-    #endif
-
-    /*----------------菜单线程初始化----------------*/
-    #ifdef  MENU_USE_RTT
-    rt_thread_t tid;
-    //创建显示线程
-    tid = rt_thread_create("display", show_process, RT_NULL, 1024*2, 11, 5);
-    //启动显示线程
-    if(RT_NULL != tid)
-    {
-        rt_thread_startup(tid);
-    }
-    #endif
 }
 void menu_adaptive_display(){
 	  showstr(40,280,"speedL:");
@@ -615,8 +591,11 @@ void rand_color(){
 void go(){  	// go go go 出发了
 	if(IS_OK){
 		
-	  pit_ms_init(TIM2_PIT, 20);     
-	  interrupt_set_priority(TIM2_IRQn, 0);
+	  Motor_Init();
+		left.errorint=0;
+		right.errorint=0;
+		left.out=0;
+		right.out=0;
 	}
 	}
 void show_gray(void){
