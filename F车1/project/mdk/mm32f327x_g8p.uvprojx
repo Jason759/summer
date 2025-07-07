@@ -541,14 +541,14 @@
               <FilePath>..\..\libraries\zf_common\zf_common_function.c</FilePath>
             </File>
             <File>
-              <FileName>zf_common_function.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_function.h</FilePath>
-            </File>
-            <File>
               <FileName>zf_common_interrupt.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\libraries\zf_common\zf_common_interrupt.c</FilePath>
+            </File>
+            <File>
+              <FileName>zf_common_function.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\libraries\zf_common\zf_common_function.h</FilePath>
             </File>
             <File>
               <FileName>zf_common_interrupt.h</FileName>

@@ -5,12 +5,12 @@
 int16 basespeed=30;            //基准速度
 extern uint8 center_line[];
 PID_t dir={         //方向PID
-	  .kp=0.95,
+	  .kp=1.5,     //1.3
 	  .ki=0,
-	  .kd=0.2,
+	  .kd=0.7,    //0.7
 	  .maxout=100,
 	  .minout=-100,
-	  .targ=93
+	  .targ=93 
 };
 uint8 check(){
 	int i,j,count=0;
@@ -28,7 +28,7 @@ uint8 check(){
 }
 void Tracking(){    	//循迹函数
 	if(check()){
-		dir.actual=center_line[45];   //预瞄点，速度越快，前瞻越远
+		dir.actual=center_line[60];   //预瞄点，速度越快，前瞻越远 53
 	 PID_update(&dir);
 	motor_set_target(basespeed-dir.out,basespeed+dir.out);
 	}

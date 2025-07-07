@@ -592,8 +592,8 @@ void go(){  	// go go go ³ö·¢ÁË
 	if(IS_OK){
 		
 	  Motor_Init();
-		left.errorint=0;
-		right.errorint=0;
+		left.error0=0;
+		right.error0=0;
 		left.out=0;
 		right.out=0;
 	}

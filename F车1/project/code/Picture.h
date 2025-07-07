@@ -21,6 +21,7 @@ int adaptiveThreshold(int *image);
 uint8 otsuThreshold(uint8 *image);
 void picture_process();
 void image_show();
+void get_turning_point();
 extern void image_process(void); //直接在中断或循环里调用此程序就可以循环执行了
 void ImagePerspective_Init(void);
 void rep_show();
