@@ -42,21 +42,22 @@ extern uint8 image_thereshold;
 uint8 showflag=0;
 PID_t left={
 	  .kp=0.3,   //0.3
-	  .ki=0.01,  //0.02
+	  .ki=0.01,  //0.02//0.01
 	  .kd=0,
-	  .maxout=50,
-	  .minout=-50,
+	  .maxout=60,
+	  .minout=-60,
 	  .targ=0
 };
 
 PID_t right={
-	  .kp=0.3,   //0.3
-	  .ki=0.01,  //0.02
+	  .kp=0.0,   //0.3
+	  .ki=0.00,  //0.02//0.01
 	  .kd=0,
 	  .maxout=50,
 	  .minout=-50,
     .targ=0
 };
+int16 basespeed=80;            //基准速度
 int main (void)
 {   
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
@@ -65,12 +66,11 @@ int main (void)
 	  //ImagePerspective_Init();   //逆透视初始化
 	  Encoder_Init();
 	  menu_init();
-	  pit_ms_init(TIM6_PIT, 100);
-	  interrupt_set_priority(TIM6_IRQn, 1);
 	  pit_ms_init(TIM2_PIT, 1);     
 	  interrupt_set_priority(TIM2_IRQn, 0);
 	  while(1)
     {
+		motor_set_target(basespeed,basespeed);
 		menu_adaptive_display();
     show_process(NULL);
 		image_process();

@@ -42,6 +42,7 @@ extern int32 encoder1;
 extern int32 encoder2;
 extern PID_t left;
 extern PID_t right;
+extern PID_t dir;
 //-------------------------------------------------------------------------------------------------------------------
 // 函数简介     TIM1 的定时器更新中断服务函数 启动 .s 文件定义 不允许修改函数名称
 //              默认优先级 修改优先级使用 interrupt_set_priority(TIM1_UP_IRQn, 1);
@@ -64,18 +65,18 @@ void TIM2_IRQHandler (void)
 {   
 	  
     // 此处编写用户代码
-	  count1++;
-	if(count1>=5){
-		count1=0;
-	  Tracking();
-	}
+	Tracking();
 	count2++;
 	if(count2>=5){
-		left.actual=Encoder1_get();
-		right.actual=Encoder2_get();
+		  encoder1=encoder_get_count(TIM3_ENCODER);
+			encoder_clear_count(TIM3_ENCODER);
+			encoder2=encoder_get_count(TIM4_ENCODER);
+			encoder_clear_count(TIM4_ENCODER);
+		  left.actual=(Encoder2_get()+Encoder1_get())/2;
+		  right.actual=(Encoder2_get()+Encoder1_get())/2;
 	  increment_pid_update(&left);
-	  increment_pid_update(&right);
-		motor(left.out,right.out);
+	  //increment_pid_update(&right);
+		motor(left.out-dir.out,left.out+dir.out);
 		count2=0;
 	}
 	// 此处编写用户代码
@@ -125,10 +126,6 @@ void TIM5_IRQHandler (void)
 void TIM6_IRQHandler (void)
 {
     // 此处编写用户代码
-    	encoder1=encoder_get_count(TIM3_ENCODER);
-			encoder_clear_count(TIM3_ENCODER);
-			encoder2=encoder_get_count(TIM4_ENCODER);
-			encoder_clear_count(TIM4_ENCODER);
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }

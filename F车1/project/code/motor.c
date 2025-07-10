@@ -26,8 +26,8 @@ void Motor_Init(void)
   */
 void Motor_SetLeftSpeed(int8_t duty)
 {
-	if ((duty*100)>PWM_DUTY_MAX){duty=PWM_DUTY_MAX/100;}
-	if (((-duty)*100)>PWM_DUTY_MAX){duty=-(PWM_DUTY_MAX/100);}
+	if ((duty*100)>PWM_DUTY_MAX){duty=PWM_DUTY_MAX/101;}
+	if (((-duty)*100)>PWM_DUTY_MAX){duty=-(PWM_DUTY_MAX/101);}
 		
 	if (duty >= 0)							//如果设置正转的速度值
 	{

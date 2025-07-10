@@ -25,5 +25,4 @@ void get_turning_point();
 extern void image_process(void); //直接在中断或循环里调用此程序就可以循环执行了
 void ImagePerspective_Init(void);
 void rep_show();
-void ImagePerspective_Init(void);
 #endif

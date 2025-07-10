@@ -25,6 +25,7 @@ extern  PID_t right;
 extern  PID_t dir;
 extern uint8 basespeed;
 extern uint8 showflag;
+extern uint8 status;
 uint8 DAD_NUM=1;
 
 #ifdef USE_STATIC_MENU
@@ -560,6 +561,7 @@ void menu_adaptive_display(){
 		showint32(175,280,left.targ,3);
 		showint32(175,300,right.targ,3);
 	  showint32(200,300,dir.actual,3);
+	  showint32(220,300,status,1);
 	  system_delay_ms(20);
 }
 //²Ëµ¥º¯Êý

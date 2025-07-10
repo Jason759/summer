@@ -231,7 +231,7 @@ example：
 	search_l_r((uint16)USE_num,image,&data_stastics_l, &data_stastics_r,start_point_l[0],
 				start_point_l[1], start_point_r[0], start_point_r[1],&hightest);
  */
-#define USE_num	image_h*3	//定义找点的数组成员个数按理说300个点能放下，但是有些特殊情况确实难顶，多定义了一点
+#define USE_num	image_h*3	//定义找点的数组成员个数按理说300个点能放下，但是有些特殊情况确实难顶，多定义了一点(减少一点）
 
  //存放点的x，y坐标
 uint16 points_l[(uint16)USE_num][2] = { {  0 } };//左线
@@ -696,43 +696,58 @@ uint16 L_A,L_P,L_V;
 uint8 L_duan_A(){
 	uint16 i,count=0,flag=0;
 	L_A=0;
- for(i=1;i<data_stastics_l-1;i++){
-	 if(points_l[i-1][0]>points_l[i][0]&&points_l[i][0]<points_l[i+1][0]){
+ for(i=2;i<70;i++){
+	 if(points_l[i-2][1]<points_l[i][1]&&points_l[i][1]>points_l[i+2][1]){//&&points_l[i-1][0]<points_l[i][0]&&points_l[i][0]>points_l[i+1][0]){
 		 L_A=i;
 		 flag=1;
 		 break;
 	 }
  }
  if(flag==1){
-    return 1;
+	 ips200_show_int(190,20,points_l[L_A][1],3);
+	 ips200_show_int(190,40,points_l[L_A][0],3);
+   return 1;
  }
- else return 0;
+ else{
+    ips200_show_int(190,20,0,3);
+	 ips200_show_int(190,40,0,3);
+ }	 return 0;
 }
 uint8 L_duan_P(){
 	uint16 i,count=0,flag=0;
 	L_P=0;
- for(i=1;i<data_stastics_l-1;i++){
-	 if(l_border[i-1]<l_border[i]&&l_border[i]>l_border[i+1]){
+ for(i=40;i<119;i++){
+	 if(l_border[i-2]<l_border[i]&&l_border[i]>l_border[i+2]&&l_border[i-4]<l_border[i]&&l_border[i]>l_border[i+4]&&l_border[i-3]<l_border[i]&&l_border[i]>l_border[i+3]){
 		 L_P=i;
 		 flag=1;
+	   break;
 	 }
  }
  if(flag==1){
+	 	ips200_show_int(190,60,l_border[L_P],3);
+	  ips200_show_int(190,80,L_P,3);
     return 1;
  }
- else return 0;
+ else{
+	 ips200_show_int(190,60,0,3);
+	  ips200_show_int(190,80,0,3);
+	 return 0;
+ }
 }
 uint8 L_duan_V(){
 	uint16 i,count=0,flag=0;
-	L_A=0;
- for(i=1;i<data_stastics_l-1;i++){
-	 if(points_l[i-1][0]<points_l[i][0]&&points_l[i][0]>points_l[i+1][0]){
+	L_V=0;
+ for(i=50;i<data_stastics_l-3;i++){
+	 if(points_l[i-2][1]<points_l[i][1]&&points_l[i][1]>points_l[i+2][1]){
 		 L_V=i;
 		 flag=1;
+		 //	ips200_show_int(190,60,points_l[L_V][1],3);
 		 break;
 	 }
  }
  if(flag==1){
+	 ips200_show_int(190,60,points_l[L_V][1],3);
+	 ips200_show_int(190,60,points_l[L_V][0],3);
     return 1;
  }
  else return 0;
@@ -771,7 +786,6 @@ void image_filter(uint8(*bin_image)[image_w])//形态学滤波，简单来说就
 	}
 
 }
-
 /*
 函数名称：void image_draw_rectan(uint8(*image)[image_w])
 功能说明：给图像画一个黑框，防止找不到边线
@@ -927,20 +941,40 @@ void cross_fill()
 uint8 status=0;
 void leftcircle()
 {
+		L_duan_A();
+		L_duan_P();
+	  L_duan_V();
 	uint16 start,end,i;
 	float slope_l_rate = 0, intercept_l = 0;
-	if(status==0&&L_duan_A()&&L_duan_P()&&R_lose(0,data_stastics_r)<10&&L_lose(0,data_stastics_l)>20){
-	 slope_l_rate=(points_l[L_A][0]-l_border[L_P])/(points_l[L_A][1]-L_P);
+	if(status==0&&L_duan_A()&&L_duan_P()&&L_lose(0,data_stastics_l)>20){//&&R_lose(0,80)<10){
+		status=1;
+	}
+		if(status==1&&L_duan_P()&&L_duan_A()==0&&L_lose(0,data_stastics_l)>20){//&&R_lose(0,80)<10){
+		status=2;
+	}
+		if(status==2&&L_duan_V()&&L_lose(0,80)<10&&R_lose(0,80)<10){ 		//拉线入环
+		status=3;
+	}
+		if(status==3&&L_lose(0,data_stastics_l)<10){//&&R_lose(0,data_stastics_r)<10){
+		status=4;
+	}
+		if(status==4&&L_duan_V()&&L_lose(0,data_stastics_l)>30&&R_lose(0,data_stastics_r)<10){   //拉线出环
+	  status=5;
+	}  
+		if(status==5&&L_lose(0,data_stastics_l)<10&&R_lose(0,data_stastics_r)<10){   //回到普通赛道
+		status=0;
+	}
+	switch(status){
+	case1:
+		slope_l_rate=(points_l[L_A][0]-l_border[L_P])/(points_l[L_A][1]-L_P);
 	 intercept_l=points_l[L_A][0]-points_l[L_A][1]*slope_l_rate;        ;
-		for (i = points_l[L_P][1]; i < L_P; i++)
+		for (i = L_P; i <points_l[L_A][1] ; i++)
 		{
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
-		status=1;
-	}
-	if(status==1&&L_duan_P()&&L_duan_A()==0&&R_lose(0,data_stastics_r)<5&&L_lose(0,data_stastics_l)>20){
-	
+	  break;
+		case2:
 	  slope_l_rate=(-l_border[L_P])/(image_h-1-L_P);
 	  intercept_l=L_P-l_border[L_P]*slope_l_rate;  
 		for (i =L_P; i < image_h-1; i++)
@@ -948,22 +982,17 @@ void leftcircle()
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
-		status=2;
-	}
-	if(status==2&&L_duan_V()&&L_lose(0,data_stastics_l)<10&&R_lose(0,data_stastics_r)<10){   //拉线入环
-	 slope_l_rate=(image_h-1-L_V)/(start_point_r[0]-l_border[L_V]);
+	break;
+	case3:
+	  slope_l_rate=(start_point_r[0]-l_border[L_V])/(image_h-1-L_V);
 	  intercept_l=l_border[L_V]-L_V*slope_l_rate;  
 		for (i =L_V; i <image_h-1 ; i++)
 		{
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
-		status=3;
-	}
-	if(status==3&&L_lose(0,data_stastics_l)<10&&R_lose(0,data_stastics_r)<10){
-		status=4;
-	}
-	if(status==4&&L_duan_V()&&L_lose(0,data_stastics_l)>30&&R_lose(0,data_stastics_r)<10){   //拉线出环
+	break;
+		case5:
 		slope_l_rate=(-l_border[L_V])/(image_h-1-L_V);
 	  intercept_l=l_border[L_V]-L_V*slope_l_rate;  
 		for (i = L_V; i < image_h-1; i++)
@@ -971,12 +1000,12 @@ void leftcircle()
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
-		status=5;
-	}
-	if(status==5&&L_lose(0,data_stastics_l)<10&&R_lose(0,data_stastics_r)<10){   //回到普通赛道
-		status=0;
+		break;
+		default:
+			break;
 	}
 }
+
 /*
 函数名称：void image_process(void)
 功能说明：最终处理函数
@@ -986,7 +1015,9 @@ void leftcircle()
 example： image_process();
  */
 void image_process(void)
+
 {
+	float slope_l_rate = 0, intercept_l = 0;
 uint16 i;
 uint8 hightest = 0;//定义一个最高行，tip：这里的最高指的是y值的最小
 /*这是离线调试用的*/
@@ -1006,14 +1037,14 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 	get_left(data_stastics_l);
 	get_right(data_stastics_r);
 	//处理函数放这里
-	  //leftcircle();
+	  leftcircle();
    //cross_fill();
 	 //get_turning_point();
-}
 for (i = hightest; i < image_h-1; i++)
 	{
 		center_line[i] = (l_border[i] + r_border[i]) >> 1;//求中线
 	}
+}
 }
 //
 // Created by RUPC on 2022/9/20.
@@ -1076,14 +1107,14 @@ void image_show(){
 	 //camera_send_image(DEBUG_UART_INDEX, (const uint8 *)mt9v03x_image, MT9V03X_IMAGE_SIZE);
 
 	//根据最终循环次数画出边界点
-//	for (i = 0; i < data_stastics_l; i++)
-//	{
-//		ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
-//	}
-//	for (i = 0; i < data_stastics_r; i++)
-//	{
-//		ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
-//	}
+	for (i = 0; i < data_stastics_l; i++)
+	{
+		ips200_draw_point(points_l[i][0]+2, points_l[i][1], uesr_BLUE);//显示起点
+	}
+	for (i = 0; i < data_stastics_r; i++)
+	{
+		ips200_draw_point(points_r[i][0]-2, points_r[i][1], uesr_RED);//显示起点
+	}
 	for (i = hightest; i < image_h-1; i++)
 	{
 		ips200_draw_point(center_line[i], i, uesr_GREEN);//显示起点 显示中线	
