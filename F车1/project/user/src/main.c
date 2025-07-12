@@ -38,6 +38,7 @@
 #include "Encoder.h"
 #include "auto_menu.h"
 #include "PID.h"
+#include "BEEP.h"
 extern uint8 image_thereshold;
 uint8 showflag=0;
 PID_t left={
@@ -46,7 +47,7 @@ PID_t left={
 	  .kd=0,
 	  .maxout=60,
 	  .minout=-60,
-	  .targ=0
+	  .targ=0,
 };
 
 PID_t right={
@@ -57,7 +58,6 @@ PID_t right={
 	  .minout=-50,
     .targ=0
 };
-int16 basespeed=80;            //基准速度
 int main (void)
 {   
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
@@ -68,9 +68,9 @@ int main (void)
 	  menu_init();
 	  pit_ms_init(TIM2_PIT, 1);     
 	  interrupt_set_priority(TIM2_IRQn, 0);
-	  while(1)
-    {
-		motor_set_target(basespeed,basespeed);
+	  while(1){
+		beep_progress();
+		
 		menu_adaptive_display();
     show_process(NULL);
 		image_process();
@@ -81,6 +81,6 @@ int main (void)
 //  case 2:  picture_process(); break;
 		default: break;
 	}
-//	rep_show(); //显示逆透视图像
+	//rep_show(); //显示逆透视图像
     }
 }

@@ -480,6 +480,16 @@
               <FileType>5</FileType>
               <FilePath>..\code\Tracking.h</FilePath>
             </File>
+            <File>
+              <FileName>BEEP.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\BEEP.c</FilePath>
+            </File>
+            <File>
+              <FileName>BEEP.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\BEEP.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

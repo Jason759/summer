@@ -3,7 +3,7 @@
 #include "key.h"
 #include "PID.h"
 #include "motor.h"
-
+#include "BEEP.h"
 /*-------------------按键--------------------
                     button1返回
                     button2确定
@@ -26,6 +26,7 @@ extern  PID_t dir;
 extern uint8 basespeed;
 extern uint8 showflag;
 extern uint8 status;
+extern uint8 flag;
 uint8 DAD_NUM=1;
 
 #ifdef USE_STATIC_MENU
@@ -556,11 +557,9 @@ void menu_adaptive_display(){
 		showstr(40,300,"speedR:");
 		showint32(95,280,left.actual,3);
 		showint32(95,300,right.actual,3);
-		showstr(125,280,"TragL:");
-		showstr(125,300,"TragR:");
+		showstr(125,280,"Trag:");
 		showint32(175,280,left.targ,3);
-		showint32(175,300,right.targ,3);
-	  showint32(200,300,dir.actual,3);
+	  showint32(175,300,dir.actual,3);
 	  showint32(220,300,status,1);
 	  system_delay_ms(20);
 }
@@ -582,12 +581,9 @@ void day_night(){
 	}
 }
 
-void rand_color(){
+void BEEP_ON(){
     if(IS_OK){
-        uint16 color;
-        color = rand()%(32768*2);
-        ips200_set_color(color,~color);
-        showstr(0,(SON_NUM+1)*16+160,"rand");
+      gpio_init(BEEP, GPO, GPIO_LOW, GPO_PUSH_PULL); 
     }
 }
 void go(){  	// go go go 出发了
@@ -598,6 +594,7 @@ void go(){  	// go go go 出发了
 		right.error0=0;
 		left.out=0;
 		right.out=0;
+		flag=0;
 	}
 	}
 void show_gray(void){
@@ -641,7 +638,7 @@ void FUN_INIT(){
 	//菜单单元函数指针初始化
 	fun_init(go	,"go");
 	fun_init(day_night	,"day_night");
-	fun_init(rand_color	,"rand_color");
+	fun_init(BEEP_ON	,"BEEP_on");
 	fun_init(show_gray	,"show_gray");
 	fun_init(show_proc	,"show_proc");
 	fun_init(off_show	,"off_show");
