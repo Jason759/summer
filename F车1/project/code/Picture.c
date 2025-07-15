@@ -2,6 +2,7 @@
 #include "Picture.h"
 #include "math.h"
 #include "BEEP.h"
+extern uint8 per;
 int my_abs(int value)
 {
 if(value>=0) return value;
@@ -685,12 +686,12 @@ void get_right(uint16 total_R)
 	}
 }
 //
-uint16 R_A,R_P,R_V;
+uint16 R_A,R_P,R_V,L_Z;
 uint8 R_duan_A(){
 	uint16 i,count=0,flag=0;
 	R_A=0;
  for(i=2;i<70;i++){
-	 if(points_r[i-2][1]<points_r[i][1]&&points_r[i][1]>points_r[i+2][1]){//&&points_r[i-1][0]<points_r[i][0]&&points_r[i][0]>points_r[i+1][0]){
+	 if(points_r[i-2][1]<points_r[i][1]&&points_r[i][1]>points_r[i+2][1]&&points_l[i][1]<70){//&&points_r[i-1][0]<points_r[i][0]&&points_r[i][0]>points_r[i+1][0]){
 		 R_A=i;
 		 flag=1;
 		 break;
@@ -720,17 +721,33 @@ uint8 R_duan_P(){
 uint8 R_duan_V(){
 	uint16 i,count=0,flag=0;
 	R_V=0;
- for(i=2;i<100;i++){
-	 if(points_r[i][1]>points_r[i+1][1]&&points_r[i][1]>=points_r[i-1][1]){
+ for(i=2;i<120;i++){
+	 if(points_r[i][1]>points_r[i+1][1]&&points_r[i][1]>points_r[i+2][1]&&points_r[i][1]>points_r[i-1][1]&&points_r[i][1]>points_r[i-2][1]){
 		 R_V=i;
 		 flag=1;
-		 break;
+	   break;
 	 }
  }
  if(flag==1){
     return 1;
  }
  else return 0;
+}
+uint8 L_duan_Z(){
+	uint16 i,count=0,flag=0;
+	L_Z=0;
+ for(i=4;i<70;i++){
+	 if(points_l[i-2][0]<points_l[i][0]&&points_l[i][0]>points_l[i+2][0]&&points_l[i-3][0]<points_l[i][0]&&points_l[i][0]>points_l[i+3][0]&&points_l[i-4][0]<points_l[i][0]&&points_l[i][0]>points_l[i+4][0]){//&&points_r[i-1][0]<points_r[i][0]&&points_r[i][0]>points_r[i+1][0]){
+		 L_Z=i;
+		 flag=1;
+		 break;
+	 }
+ }
+ if(flag==1){
+   return 1;
+ }
+ else{
+ }	 return 0;
 }
 //定义膨胀和腐蚀的阈值区间
 #define threshold_max	255*5//此参数可根据自己的需求调节
@@ -919,56 +936,48 @@ void cross_fill()
 	}
 }
 uint8 status=0;
+uint32 count_time=0;
+uint8 circle=0;
 void rightcircle()
 {
-//	float slope_l_rate = 0, intercept_l = 0;
-//	uint8 i;
-//		R_duan_A();
-//		R_duan_P();
-//	  R_duan_V();
-//	
-//	if(L_duan_A()&&L_duan_P()&&L_lose(0,80)>20&&R_lose(0,60)<10){
-//		status=1;
-//	}
-//		if(status==1){
-//		slope_l_rate=(-l_border[R_P])/(image_h-1-R_P);
-//	  intercept_l=R_P-l_border[R_P]*slope_l_rate;  
-//		for (i =R_P; i < image_h-1; i++)
-//		{
-//			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
-//			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
-//		}
-//		for(i = hightest; i < image_h-1; i++)
-//		r_border[i]=r_border[i]-40;
 	uint16 start,end,i;
 	float slope_l_rate = 0, intercept_l = 0;
-	if(L_lose(0,120)>10)
+	if(circle<1){
+	if(L_lose(0,120)>10&&status==1)
 		status=0;
-	if(status==0&&R_duan_A()&&R_lose(0,data_stastics_r)>30&&L_lose(0,data_stastics_l)<5){
-		beep_on();
+	if(status==0&&R_duan_A()&&R_lose(0,data_stastics_r)>30&&L_lose(0,data_stastics_l)<5){	
+    beep_on();
 		status=1;
 	}
-		if(status==1&&R_duan_P()&&R_duan_A()==0&&R_P>60&&R_lose(0,data_stastics_r)>20&&L_lose(0,data_stastics_l)<5){//&&R_lose(0,80)<10){
+		if(status==1&&R_duan_P()&&R_duan_A()==0&&R_P>40&&R_lose(0,data_stastics_r)>20&&L_lose(0,data_stastics_l)<5){//&&R_lose(0,80)<10){
 		  beep_on();
 			status=2;
 	}
-		if(status==2&&R_duan_P()&&R_duan_V()&&R_P>60&&L_lose(0,data_stastics_l)<5&&R_lose(0,data_stastics_r)>10){ 		//拉线入环
+		if(status==2&&R_duan_P()&&R_P>50&&L_lose(0,data_stastics_l)<5&&R_lose(0,data_stastics_r)>10){ 		//拉线入环
 			beep_on();
 			status=3;
 	}
-//		if(status==3&&L_lose(0,data_stastics_l)<5&&R_lose(0,data_stastics_r)<5){//&&R_Rose(0,data_stastics_r)<10){
-//		status=4;
+//		if(status==3&&L_lose(0,data_stastics_l)<5){//&&R_Rose(0,data_stastics_r)<10){
+//		  beep_on();
+//			status=4;
 //	}
-//		if(status==4&&R_duan_V()&&R_lose(0,data_stastics_r)>30&&R_lose(0,data_stastics_r)<10){   //拉线出环
-//	  status=5;
-//	}  
-//		if(status==5&&R_lose(0,data_stastics_r)<10&&R_lose(0,data_stastics_r)<10){   //回到普通赛道
-//		status=0;
+		if(status==4&&L_duan_Z()&&L_lose(0,70)>10&&R_lose(0,70)>10){   //拉线出环
+	    beep_on();
+			status=5;
+	}  
+//		if(status==5&&L_duan_Z()==0&&R_lose(0,data_stastics_r)>20&&R_lose(0,100)<10){
+//    beep_on();
+//		status=6;
 //	}
+		if(status==6&&R_lose(0,data_stastics_r)<5&&R_lose(0,data_stastics_l)<5){   //回到普通赛道
+		  beep_on();
+	    circle++;
+			status=0;
+	}
 	switch(status){
 	case 1:
-		l_border[60]=93;
-	  r_border[60]=93;
+		l_border[per]=93;
+	  r_border[per]=93;
 //	  if(R_duan_A()){
 //		slope_l_rate=(points_r[R_A][0]-start_point_r[0])/(points_r[R_A][1]-start_point_r[1]);
 //	  intercept_l=points_r[R_A][0]-points_r[R_A][1]*slope_l_rate; 
@@ -980,7 +989,7 @@ void rightcircle()
 //	}
 	  break;
 		case 2:
-		if(R_duan_P()&&R_P>60){
+		if(R_duan_P()&&R_P>40){
 	  slope_l_rate=(image_w-3-r_border[R_P])/(image_h-1-R_P);
 	  intercept_l=r_border[R_P]-R_P*slope_l_rate;  
 		for (i =R_P; i < image_h-1; i++)
@@ -991,29 +1000,34 @@ void rightcircle()
 	}
 	break;
 	case 3:
-		if(R_duan_V()){
-	  slope_l_rate=(0-r_border[R_V])/(image_h-2-R_V);
-	  intercept_l=r_border[R_V]-R_V*slope_l_rate;  
-		for (i =R_V; i <image_h-2 ; i++)
+//		if(R_duan_V()){
+//	  slope_l_rate=(0-r_border[R_V])/(image_h-2-R_V);
+//	  intercept_l=r_border[R_V]-R_V*slope_l_rate;  
+//		for (i =R_V; i <image_h-2 ; i++)
+//		{
+//			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+//			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
+//		}
+//	}
+	  for(i = hightest; i < image_h-1; i++)
+		l_border[i]=l_border[i]+30;
+	break;
+		case 5:
+		if(L_duan_Z()){
+		slope_l_rate=(160-points_l[L_Z][0])/(1-points_l[L_Z][1]);
+	  intercept_l=points_l[L_Z][0]-points_l[L_Z][1]*slope_l_rate;  
+			for (i = 1; i < points_l[L_Z][1]; i++)
 		{
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
 	}
-	break;
-		case 5:
-		slope_l_rate=(-l_border[R_V])/(image_h-1-R_V);
-	  intercept_l=l_border[R_V]-R_V*slope_l_rate;  
-		for (i = R_V; i < image_h-1; i++)
-		{
-			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
-			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
-		}
 		break;
 		default:
 			break;
 	}
 }
+	}
 uint16 count_stop=0;
 uint8 black_stop(){
 	uint16 i,j,count=0;

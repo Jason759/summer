@@ -43,6 +43,8 @@ extern int32 encoder2;
 extern PID_t left;
 extern PID_t right;
 extern PID_t dir;
+extern uint32 count_time;
+extern uint8 status;
 //-------------------------------------------------------------------------------------------------------------------
 // 函数简介     TIM1 的定时器更新中断服务函数 启动 .s 文件定义 不允许修改函数名称
 //              默认优先级 修改优先级使用 interrupt_set_priority(TIM1_UP_IRQn, 1);
@@ -90,7 +92,7 @@ void TIM2_IRQHandler (void)
 void TIM3_IRQHandler (void)
 {
     // 此处编写用户代码
-
+	
     // 此处编写用户代码
     TIM3->SR &= ~TIM3->SR;                                                      // 清空中断状态
 }
@@ -126,6 +128,20 @@ void TIM5_IRQHandler (void)
 void TIM6_IRQHandler (void)
 {
     // 此处编写用户代码
+	if(status==3){
+    count_time++;
+		if(count_time>1000){
+			count_time=0;
+			status=4;
+		}
+	}
+//	if(status==5){
+//		 count_time++;
+//		if(count_time>1000){
+//			count_time=0;
+//			status=6;
+//		}
+//	}
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }

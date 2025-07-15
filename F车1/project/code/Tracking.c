@@ -3,10 +3,11 @@
 #include "PID.h"
 #include "motor.h"
 extern uint8 center_line[];
+extern uint8 status;
 int16 basespeed=80;            //基准速度
 uint16 per=60; //前瞻  60
 PID_t dir={         //方向PID
-	  .kp=0.55,     //0.55
+	  .kp=0.6,     //0.55//0.6
 	  .ki=0.,
 	  .kd=1,         //1
 	  .maxout=30,
@@ -23,13 +24,12 @@ uint8 check(){
          count++;
       }
   }
-	if(count>=image_w*2)
+	if(count>=image_w*3)
 	    return 0;
 	else return 1;
 }
 uint8 flag=0;
 void Tracking(){ 	//循迹函数
-	
 	if(black_stop()){
 		flag=1;
 	}
@@ -41,8 +41,16 @@ void Tracking(){ 	//循迹函数
 	 PID_update(&dir);
 	 motor_set_target(basespeed,basespeed);
 	}
+	
 	else{
 		motor_set_target(0,0);}
+	if(center_line[per]<95&&center_line[per]>90){
+		motor_set_target(100,100);
+	}
+	if(status==3||status==4){
+	  motor_set_target(60,60);
+	}
+	
 	if(flag==1){
 		motor_set_target(0,0);
 	}

@@ -66,11 +66,12 @@ int main (void)
 	  //ImagePerspective_Init();   //逆透视初始化
 	  Encoder_Init();
 	  menu_init();
-	  pit_ms_init(TIM2_PIT, 1);     
+	  pit_ms_init(TIM2_PIT, 1);   
+    pit_ms_init(TIM6_PIT, 1);  
 	  interrupt_set_priority(TIM2_IRQn, 0);
+	  interrupt_set_priority(TIM6_IRQn, 1);
 	  while(1){
 		beep_progress();
-		
 		menu_adaptive_display();
     show_process(NULL);
 		image_process();
