@@ -474,7 +474,7 @@ void get_turning_point(void)
     R_corner_angle = 0;
 	for (i = 1; i < 100; i++)
 	{
-		if (dir_l[i - 1] == 6 && dir_l[i] == 6 && dir_l[i + 1] == 6 && dir_l[i + 3] !=6 && dir_l[i + 5]!=6&&L_lose(0,90)>30)
+		if (L_lose(0,100)>20&&dir_l[i - 1] == 6 && dir_l[i] == 6 && dir_l[i + 1] == 6 && dir_l[i + 3] !=6 && dir_l[i + 5]!=6&&L_lose(0,90)>30)
 		{
 			L_corner2=i;//传递y坐标
 			break;
@@ -482,7 +482,7 @@ void get_turning_point(void)
 	}
 	for (i = 1; i < 50; i++)
 	{
-		if (dir_l[i - 1] !=2 && dir_l[i] != 2 && dir_l[i + 1] == 2 && dir_l[i + 3] == 2 && dir_l[i + 5] == 2&&L_lose(0,90)>30)
+		if (L_lose(0,100)>20&&dir_l[i - 1] !=2 && dir_l[i] != 2 && dir_l[i + 1] == 2 && dir_l[i + 3] == 2 && dir_l[i + 5] == 2&&L_lose(0,90)>30)
 		{
 			L_corner1=i;//传递y坐标
 			break;
@@ -490,7 +490,7 @@ void get_turning_point(void)
 	}
 	for (i = 1; i < 100; i++)
 	{
-		if (dir_r[i - 1] == 6 && dir_r[i] == 6 && dir_r[i + 1] == 6 && dir_r[i + 3]!=6 && dir_r[i + 5]!=6&&R_lose(0,90)>30)
+		if (R_lose(0,100)>20&&dir_r[i - 1] == 6 && dir_r[i] == 6 && dir_r[i + 1] == 6 && dir_r[i + 3]!=6 && dir_r[i + 5]!=6&&R_lose(0,90)>30)
 		{
 			R_corner2=i;//传递y坐标
 			break;
@@ -498,7 +498,7 @@ void get_turning_point(void)
 	}
 	for (i = 1; i <50; i++)
 	{
-		if (dir_r[i - 1] != 2 && dir_r[i] != 2 && dir_r[i + 1] == 2 && dir_r[i + 3] == 2 && dir_r[i + 5] ==2&&R_lose(0,90)>30)
+		if (R_lose(0,100)>20&&dir_r[i - 1] != 2 && dir_r[i] != 2 && dir_r[i + 1] == 2 && dir_r[i + 3] == 2 && dir_r[i + 5] ==2&&R_lose(0,90)>30)
 		{
 			R_corner1=i;//传递y坐标
 			break;
@@ -547,10 +547,6 @@ void get_turning_point(void)
 //                    }
 //                }
 //            }
-						ips200_show_int(190,40,points_l[L_corner1][1],3);
-						ips200_show_int(190,60,points_l[L_corner2][1],3);
-						ips200_show_int(190,80,points_r[R_corner1][1],3);
-						ips200_show_int(190,100,points_r[R_corner2][1],3);
         }
 
 //void get_turning_point(void)
@@ -889,7 +885,7 @@ void cross_fill()
 	uint8 start, end;
 	float slope_l_rate = 0, intercept_l = 0;
 	get_turning_point();
-	if (points_l[L_corner2][1]&&bin_image[image_h - 2][4])//两边生长方向都符合条件
+	if (points_l[L_corner2][1]&&bin_image[image_h - 2][4]&&L_lose(0,data_stastics_l-1)>20)//两边生长方向都符合条件
 	{
 		//计算斜率		
 		start = points_l[L_corner2][1] - 15;
@@ -902,7 +898,7 @@ void cross_fill()
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
 	}
-		if(points_r[R_corner2][1]&& bin_image[image_h - 2][image_w - 4]){
+		if(points_r[R_corner2][1]&& bin_image[image_h - 2][image_w - 4]&&R_lose(0,data_stastics_r-1)>20){
 		//计算斜率
 		start = points_r[R_corner2][1] - 15;//起点
 		start = limit_a_b(start, 0, image_h);//限幅
@@ -915,7 +911,7 @@ void cross_fill()
 			r_border[i] = limit_a_b(r_border[i], border_min, border_max);
 		}
 	}
-	if(points_l[L_corner1][1]&&points_l[L_corner2][1]){
+	if(points_l[L_corner1][1]&&points_l[L_corner2][1]&&L_lose(0,data_stastics_l-1)>20){
 		slope_l_rate=(float)(points_l[L_corner1][0]-points_l[L_corner2][0])/(points_l[L_corner1][1]-points_l[L_corner2][1]);
 	 intercept_l=points_l[L_corner1][0]-points_l[L_corner1][1]*slope_l_rate;        ;
 		for (i = points_l[L_corner2][1]; i<points_l[L_corner1][1]; i++)
@@ -924,7 +920,7 @@ void cross_fill()
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
 	}
-		if(points_r[R_corner1][1]&&points_r[R_corner2][1]){
+		if(points_r[R_corner1][1]&&points_r[R_corner2][1]&&R_lose(0,data_stastics_r-1)>20){
 	 slope_l_rate=(float)(points_r[R_corner1][0]-points_r[R_corner2][0])/(points_r[R_corner1][1]-points_r[R_corner2][1]);
 	 intercept_l=points_r[R_corner1][0]-points_r[R_corner1][1]*slope_l_rate;        ;
 		for (i = points_r[R_corner2][1]; i<points_r[R_corner1][1]; i++)
@@ -949,11 +945,11 @@ void rightcircle()
     beep_on();
 		status=1;
 	}
-		if(status==1&&R_duan_P()&&R_duan_A()==0&&R_P>40&&R_lose(0,data_stastics_r)>20&&L_lose(0,data_stastics_l)<5){//&&R_lose(0,80)<10){
+		if(status==1&&R_duan_P()&&R_duan_A()==0&&R_P>50&&R_lose(0,data_stastics_r)>20&&L_lose(0,data_stastics_l)<5){//&&R_lose(0,80)<10){
 		  beep_on();
 			status=2;
 	}
-		if(status==2&&R_duan_P()&&R_P>50&&L_lose(0,data_stastics_l)<5&&R_lose(0,data_stastics_r)>10){ 		//拉线入环
+		if(status==2&&R_duan_P()&&R_P>60&&L_lose(0,data_stastics_l)<5&&R_lose(0,data_stastics_r)>10){ 		//拉线入环
 			beep_on();
 			status=3;
 	}

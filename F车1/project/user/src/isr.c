@@ -41,7 +41,7 @@
 extern int32 encoder1;
 extern int32 encoder2;
 extern PID_t left;
-extern PID_t right;
+extern PID_t Angle;
 extern PID_t dir;
 extern uint32 count_time;
 extern uint8 status;
@@ -67,19 +67,19 @@ void TIM2_IRQHandler (void)
 {   
 	  
     // 此处编写用户代码
-	Tracking();
 	count2++;
+	
+	  Tracking();
+	//Angle_out();
 	if(count2>=5){
 		  encoder1=encoder_get_count(TIM3_ENCODER);
 			encoder_clear_count(TIM3_ENCODER);
 			encoder2=encoder_get_count(TIM4_ENCODER);
 			encoder_clear_count(TIM4_ENCODER);
 		  left.actual=(Encoder2_get()+Encoder1_get())/2;
-		  right.actual=(Encoder2_get()+Encoder1_get())/2;
-	  increment_pid_update(&left);
-	  //increment_pid_update(&right);
-		motor(left.out-dir.out,left.out+dir.out);
-		count2=0;
+	    increment_pid_update(&left);
+		  motor(left.out-dir.out,left.out+dir.out);
+		  count2=0;
 	}
 	// 此处编写用户代码
     TIM2->SR &= ~TIM2->SR;                                                      // 清空中断状态
@@ -130,18 +130,18 @@ void TIM6_IRQHandler (void)
     // 此处编写用户代码
 	if(status==3){
     count_time++;
-		if(count_time>1000){
+		if(count_time>2000){
 			count_time=0;
 			status=4;
 		}
 	}
-//	if(status==5){
-//		 count_time++;
-//		if(count_time>1000){
-//			count_time=0;
-//			status=6;
-//		}
-//	}
+	if(status==5){
+		 count_time++;
+		if(count_time>1000){
+			count_time=0;
+			status=6;
+		}
+	}
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }

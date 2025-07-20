@@ -36,6 +36,18 @@ void PID_calculate(int error,PID_t *p){
 		if(p->out<p->minout)
 		{p->out=p->minout;}
 }
+void PID_gyro_update(PID_t *p,int gyro){
+	p->error1=p->error0;
+		p->error0=p->targ-p->actual;
+	  p->errorint+=p->error0;
+		if(p->errorint>1000){p->errorint=1000;}
+    if(p->errorint<-1000){p->errorint=-1000;}
+	   p->out=p->kp*p->error0+p->ki*p->errorint+p->kd*(p->error0-p->error1)+p->kd2*gyro;
+		if(p->out>p->maxout)
+		{p->out=p->maxout;}
+		if(p->out<p->minout)
+		{p->out=p->minout;}
+}
 /*void controldata(){
 	if(Serial_RxPacket[0]=='P'&&Serial_RxPacket[1]=='1')
 			left.kp=getvofadata();	

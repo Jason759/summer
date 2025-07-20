@@ -43,10 +43,10 @@ extern uint8 image_thereshold;
 uint8 showflag=0;
 PID_t left={
 	  .kp=0.3,   //0.3
-	  .ki=0.01,  //0.02//0.01
+	  .ki=0.012,  //0.02//0.01
 	  .kd=0,
-	  .maxout=60,
-	  .minout=-60,
+	  .maxout=50,
+	  .minout=-50,
 	  .targ=0,
 };
 
@@ -63,6 +63,7 @@ int main (void)
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
     mt9v03x_init();
+	  mpu6050_init();
 	  //ImagePerspective_Init();   //逆透视初始化
 	  Encoder_Init();
 	  menu_init();

@@ -23,6 +23,7 @@ static menu_unit *P_dad_head 	= NULL;
 extern  PID_t left;
 extern  PID_t right;
 extern  PID_t dir;
+extern  PID_t Angle;
 extern uint8 basespeed;
 extern uint8 showflag;
 extern uint8 status;
@@ -35,7 +36,39 @@ param_set   my_param_set[MEM_SIZE];
 uint8       my_index[MEM_SIZE*2];
 static int  static_cnt=0;
 #endif
+#define FLASH_SECTION_INDEX       (127)                                         // 存储数据用的扇区 倒数第一个扇区
+#define FLASH_PAGE_INDEX          (3)                                           // 存储数据用的页码 倒数第一个页码
+void menu_save(void)
+{
+    if(flash_check(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX))                      // 判断是否有数据
+    {
+        flash_erase_page(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX);                // 擦除这一页
+    }
+    flash_buffer_clear(); //擦除缓存区
+    //写入缓冲区
+    flash_union_buffer[0].float_type  = left.kp;
+    flash_union_buffer[1].float_type  = left.ki;
 
+    flash_union_buffer[2].float_type  = left.kd;
+    flash_union_buffer[3].float_type  = dir.kp;
+    flash_union_buffer[4].float_type  = dir.ki;
+    flash_union_buffer[5].float_type  = dir.kd2;
+		flash_union_buffer[6].float_type  = basespeed;
+    flash_write_page_from_buffer(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX);        // 向指定 Flash 扇区的页码写入缓冲区数据
+}
+void menu_load(void)
+{
+    flash_read_page_to_buffer(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX);           // 将数据从 flash 读取到缓冲区ad_page_to_buffer;
+    //参数读出
+    left.kp=flash_union_buffer[0].float_type;
+    left.ki=flash_union_buffer[1].float_type;
+    left.kp=flash_union_buffer[2].float_type;
+    dir.kp=flash_union_buffer[3].float_type;
+    dir.ki=flash_union_buffer[4].float_type;
+    dir.kd2=flash_union_buffer[5].float_type;
+    basespeed=flash_union_buffer[6].float_type;
+    flash_buffer_clear(); //擦除缓存区
+}
 //函数数组指针
 void (*current_operation_menu)(void);
 
@@ -433,7 +466,8 @@ void change_value(param_set* param)
 			}			
 		}
 	}
-	last_index = p_unit->m_index[1];	
+	last_index = p_unit->m_index[1];
+  menu_save();	
 }
 
 //是否为第一次进入新页面
@@ -551,12 +585,14 @@ void menu_init()
 
     /*---------------字符串索引初始化----------------*/
     index_xy_init();
+	  /*---------------flash引初始化----------------*/
+	  menu_load();
 }
 void menu_adaptive_display(){
-	  showstr(40,280,"speedL:");
-		showstr(40,300,"speedR:");
+	  showstr(40,280,"speed:");
+		showstr(40,300,"gyro:");
 		showint32(95,280,left.actual,3);
-		showint32(95,300,right.actual,3);
+		//showint32(95,300,Angle.actual,3);
 		showstr(125,280,"Trag:");
 		showint32(175,280,left.targ,3);
 	  showint32(175,300,dir.actual,3);
@@ -624,12 +660,12 @@ void UNIT_SET(){
     unit_param_set(&left.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kp");
     unit_param_set(&left.ki,TYPE_FLOAT ,0.001  ,1  ,3,NORMAL_PAR,"left.ki");
     unit_param_set(&left.kd,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kd");
-    unit_param_set(&right.kp,TYPE_FLOAT ,0.01 ,1  ,2,NORMAL_PAR,"right.kp");
-    unit_param_set(&right.ki,TYPE_FLOAT ,0.001 ,1  ,3,NORMAL_PAR,"right.ki");
-	  unit_param_set(&right.kd,TYPE_FLOAT ,0.01 ,1  ,2,NORMAL_PAR,"right.kd");
+//    unit_param_set(&Angle.kp,TYPE_FLOAT ,0.001 ,1  ,3,NORMAL_PAR,"Angle.kp");
+//    unit_param_set(&Angle.ki,TYPE_FLOAT ,0.001 ,1  ,3,NORMAL_PAR,"Angle.ki");
+//	  unit_param_set(&Angle.kd,TYPE_FLOAT ,0.01 ,1  ,2,NORMAL_PAR,"Angle.kd");
 	  unit_param_set(&dir.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.kp");
     unit_param_set(&dir.ki,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.ki");
-    unit_param_set(&dir.kd,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.kd");
+	  unit_param_set(&dir.kd2,TYPE_FLOAT ,0.0001 ,1  ,4,NORMAL_PAR,"dir.kd2");
     unit_param_set(&basespeed,TYPE_INT ,10  ,3  ,2,NORMAL_PAR,"basespeed1");
 	  unit_param_set(&basespeed,TYPE_INT ,20  ,3  ,2,NORMAL_PAR,"basespeed1");
 	  unit_param_set(&basespeed,TYPE_INT ,50 ,3  ,2,NORMAL_PAR,"basespeed2");
