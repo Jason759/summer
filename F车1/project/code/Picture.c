@@ -931,16 +931,15 @@ void cross_fill()
 		
 	}
 }
-uint8 status=0;
+uint8 status=7;
 uint32 count_time=0;
-uint8 circle=0;
 void rightcircle()
 {
-	uint16 start,end,i;
+uint16	 start,end,i;
 	float slope_l_rate = 0, intercept_l = 0;
-	if(circle<1){
-	if(L_lose(0,120)>10&&status==1)
+	if(L_lose(0,120)>10&&status==1){
 		status=0;
+}
 	if(status==0&&R_duan_A()&&R_lose(0,data_stastics_r)>30&&L_lose(0,data_stastics_l)<5){	
     beep_on();
 		status=1;
@@ -967,9 +966,8 @@ void rightcircle()
 //	}
 		if(status==6&&R_lose(0,data_stastics_r)<5&&R_lose(0,data_stastics_l)<5){   //回到普通赛道
 		  beep_on();
-	    circle++;
-			status=0;
-	}
+			status=7;
+		}
 	switch(status){
 	case 1:
 		l_border[per]=93;
@@ -1023,7 +1021,6 @@ void rightcircle()
 			break;
 	}
 }
-	}
 uint16 count_stop=0;
 uint8 black_stop(){
 	uint16 i,j,count=0;

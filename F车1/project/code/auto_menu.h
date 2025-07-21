@@ -135,7 +135,7 @@ void FUN_INIT();
 void Flash_Read();
 void Flash_Write();
 void Flash_Erase();
-
+void menu_load(void);
 
 #endif
 

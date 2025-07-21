@@ -48,7 +48,6 @@ void menu_save(void)
     //写入缓冲区
     flash_union_buffer[0].float_type  = left.kp;
     flash_union_buffer[1].float_type  = left.ki;
-
     flash_union_buffer[2].float_type  = left.kd;
     flash_union_buffer[3].float_type  = dir.kp;
     flash_union_buffer[4].float_type  = dir.ki;
@@ -62,7 +61,7 @@ void menu_load(void)
     //参数读出
     left.kp=flash_union_buffer[0].float_type;
     left.ki=flash_union_buffer[1].float_type;
-    left.kp=flash_union_buffer[2].float_type;
+    left.kd=flash_union_buffer[2].float_type;
     dir.kp=flash_union_buffer[3].float_type;
     dir.ki=flash_union_buffer[4].float_type;
     dir.kd2=flash_union_buffer[5].float_type;
@@ -467,7 +466,6 @@ void change_value(param_set* param)
 		}
 	}
 	last_index = p_unit->m_index[1];
-  menu_save();	
 }
 
 //是否为第一次进入新页面
@@ -488,7 +486,7 @@ void show_menu()
 void fun_menu()
 {
 	if(p_unit->type_t==NORMAL_PAR||p_unit->type_t==PID_PAR){
-		change_value(p_unit->par_set);
+		change_value(p_unit->par_set);	
 	}else{
 		current_operation_menu = p_unit->current_operation;		//函数指针	
 		(*current_operation_menu)();
@@ -586,7 +584,6 @@ void menu_init()
     /*---------------字符串索引初始化----------------*/
     index_xy_init();
 	  /*---------------flash引初始化----------------*/
-	  menu_load();
 }
 void menu_adaptive_display(){
 	  showstr(40,280,"speed:");
@@ -602,21 +599,11 @@ void menu_adaptive_display(){
 //菜单函数
 //更改夜间或白天模式
 static uint16 IPS200_BGCOLOR = RGB565_WHITE;
-void day_night(){
+void circle_reset(){
 	if(IS_OK){
-		if(IPS200_BGCOLOR==RGB565_WHITE){
-		    IPS200_BGCOLOR = RGB565_BLACK;
-		    ips200_set_color(RGB565_WHITE,RGB565_BLACK);
-		    showstr(0,(SON_NUM+1)*16+160,"BLACK");
-		}
-		else if(IPS200_BGCOLOR==RGB565_BLACK){
-		    IPS200_BGCOLOR = RGB565_WHITE;
-            ips200_set_color(RGB565_BLACK,RGB565_WHITE);
-			showstr(0,(SON_NUM+1)*16+160,"WHITE");
-		}
-	}
+		status=0;
 }
-
+}
 void BEEP_ON(){
     if(IS_OK){
       gpio_init(BEEP, GPO, GPIO_LOW, GPO_PUSH_PULL); 
@@ -633,10 +620,9 @@ void go(){  	// go go go 出发了
 		flag=0;
 	}
 	}
-void show_gray(void){
+void Save(void){
 	if(IS_OK){
-	 showflag=2;
-	 showstr(190,0,"gray");
+	menu_save();	
 	}
 }
 void show_proc(void){
@@ -650,6 +636,11 @@ void off_show(){
 	showflag=0;
 	clear();
 	}
+}
+void load(){
+	if(IS_OK){
+	menu_load();	
+	}	
 }
 //空闲函数
 void NULL_FUN(){
@@ -673,9 +664,10 @@ void UNIT_SET(){
 void FUN_INIT(){
 	//菜单单元函数指针初始化
 	fun_init(go	,"go");
-	fun_init(day_night	,"day_night");
+	fun_init(circle_reset	,"circle_reset");
 	fun_init(BEEP_ON	,"BEEP_on");
-	fun_init(show_gray	,"show_gray");
+	fun_init(Save	,"Save");
 	fun_init(show_proc	,"show_proc");
 	fun_init(off_show	,"off_show");
+	fun_init(load	,"load");
 }
