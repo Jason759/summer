@@ -64,6 +64,7 @@ int main (void)
     debug_init();                                                               // 初始化默认 Debug UART
     mt9v03x_init();
 	  mpu6050_init();
+	  wireless_uart_init();
 	  //ImagePerspective_Init();   //逆透视初始化
 	  Encoder_Init();
 	  pit_ms_init(TIM2_PIT, 1);   

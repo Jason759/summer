@@ -38,6 +38,7 @@
 #include "motor.h"
 #include "Encoder.h"
 #include "Tracking.h"
+#include "BEEP.h"
 extern int32 encoder1;
 extern int32 encoder2;
 extern PID_t left;
@@ -123,25 +124,27 @@ void TIM5_IRQHandler (void)
 
 //-------------------------------------------------------------------------------------------------------------------
 // 函数简介     TIM6 的定时器中断服务函数 启动 .s 文件定义 不允许修改函数名称
-//              默认优先级 修改优先级使用 interrupt_set_priority(TIM6_IRQn, 1);
+//              默认优先级 修改优先级使+用 interrupt_set_priority(TIM6_IRQn, 1);
 //-------------------------------------------------------------------------------------------------------------------
 void TIM6_IRQHandler (void)
 {
     // 此处编写用户代码
 	if(status==3){
     count_time++;
-		if(count_time>2000){
-			count_time=0;
-			status=4;
-		}
-	}
-	if(status==5){
-		 count_time++;
 		if(count_time>1000){
 			count_time=0;
-			status=6;
+			status=4;
+			beep_on();
 		}
 	}
+	
+//	if(status==5){
+//		 count_time++;
+//		if(count_time>1000){
+//			count_time=0;
+//			status=6;
+//		}
+//	}
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }
@@ -153,7 +156,7 @@ void TIM6_IRQHandler (void)
 void TIM7_IRQHandler (void)
 {
     // 此处编写用户代码
-
+	
     // 此处编写用户代码
     TIM7->SR &= ~TIM7->SR;                                                      // 清空中断状态
 }

@@ -594,6 +594,7 @@ void menu_adaptive_display(){
 		showint32(175,280,left.targ,3);
 	  showint32(175,300,dir.actual,3);
 	  showint32(220,300,status,1);
+	  showint32(190,0,flag,1);
 	  system_delay_ms(20);
 }
 //²Ëµ¥º¯Êý
