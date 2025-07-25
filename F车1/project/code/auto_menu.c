@@ -28,6 +28,7 @@ extern uint8 basespeed;
 extern uint8 showflag;
 extern uint8 status;
 extern uint8 flag;
+extern uint8 stop;
 uint8 DAD_NUM=1;
 
 #ifdef USE_STATIC_MENU
@@ -612,13 +613,13 @@ void BEEP_ON(){
 }
 void go(){  	// go go go ³ö·¢ÁË
 	if(IS_OK){
-		
 	  Motor_Init();
 		left.error0=0;
 		right.error0=0;
 		left.out=0;
 		right.out=0;
 		flag=0;
+		stop=0;
 	}
 	}
 void Save(void){

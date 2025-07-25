@@ -77,11 +77,11 @@ int main (void)
 		menu_adaptive_display();
     show_process(NULL);
 		image_process();
-		 //picture_process();
+		//picture_process();
 		 //image_show();
 	switch(showflag){
 	  case 1:  image_show(); break;
-//  case 2:  picture_process(); break;
+    case 2:  picture_process(); break;
 		default: break;
 	}
 	//rep_show(); //显示逆透视图像

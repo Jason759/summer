@@ -698,6 +698,13 @@ void get_turning_point(void)
 		}
 }
 	}
+/*
+功能说明：找圆环的特征线的点
+参数说明：
+函数返回：无
+备    注：
+example：  
+*/
 uint16 R_A,R_P,R_V,L_Z;
 uint8 R_duan_A(){
 	uint16 i,count=0,flag=0;
@@ -761,6 +768,7 @@ uint8 L_duan_Z(){
  else{
  }	 return 0;
 }
+
 uint16 L_A,L_P,L_V,R_Z;
 uint8 L_duan_A(){
 	uint16 i,count=0,flag=0;
@@ -858,6 +866,7 @@ void image_filter(uint8(*bin_image)[image_w])//形态学滤波，简单来说就
 	}
 
 }
+
 /*
 函数名称：void image_draw_rectan(uint8(*image)[image_w])
 功能说明：给图像画一个黑框，防止找不到边线
@@ -1010,6 +1019,14 @@ void cross_fill()
 		
 	}
 }
+/*
+函数名称：rightcircle()
+功能说明：左圆环状态机处理
+参数说明：
+函数返回：无
+备    注：
+example：  
+*/
 uint8 status=7;
 uint32 count_time=0;
 void rightcircle()
@@ -1051,15 +1068,6 @@ uint16	 start,end,i;
 	case 1:
 		l_border[per]=93;
 	  r_border[per]=93;
-//	  if(R_duan_A()){
-//		slope_l_rate=(points_r[R_A][0]-start_point_r[0])/(points_r[R_A][1]-start_point_r[1]);
-//	  intercept_l=points_r[R_A][0]-points_r[R_A][1]*slope_l_rate; 
-//		for (i = 55; i <points_r[R_A][1] ; i++)
-//		{
-//			r_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
-//			r_border[i] = limit_a_b(r_border[i], border_min, border_max);//限幅
-//		}
-//	}
 	  break;
 		case 2:
 		if(R_duan_P()&&R_P>40){
@@ -1100,18 +1108,26 @@ uint16	 start,end,i;
 			break;
 	}
 }
+/*
+函数名称：leftcircle()
+功能说明：左圆环状态机处理
+参数说明：
+函数返回：无
+备    注：
+example：  
+*/
 void leftcircle()
 {
 uint16	 start,end,i;
 	float slope_l_rate = 0, intercept_l = 0;
-	if(R_lose(20,120)>10&&status==1){
+	if(R_lose(60,120)>10&&status==1){
 		status=0;
 }
-	if(status==0&&L_lose(30,60)>20&&R_lose(20,120)<5&&L_lose(80,120)<5&&hightest<30){	
+	if(status==0&&L_lose(30,60)>20&&R_lose(20,120)<5&&L_lose(80,120)<5&&hightest<20){	
     beep_on();
 		status=1;
 	}
-		if(status==1&&L_duan_P()&&L_P>50&&L_lose(20,120)>20&&R_lose(20,120)<5){//&&L_lose(0,80)<10){
+		if(status==1&&L_duan_P()&&L_P>60&&L_lose(20,120)>20&&R_lose(20,120)<5){//&&L_lose(0,80)<10){
 		  beep_on();
 			status=3;
 	}
@@ -1127,7 +1143,7 @@ uint16	 start,end,i;
 			beep_on();
 			status=6;
 		}
-		if(status==6&&R_lose(60,120)<5&&L_lose(60,120)<5){   //回到普通赛道
+		if(status==6&&R_lose(100,120)<10&&L_lose(100,120)<10){   //回到普通赛道
 		  beep_on();
 			status=7;
 		}
@@ -1149,7 +1165,7 @@ uint16	 start,end,i;
 	break;
 	case 3:
 	  for(i = hightest; i < image_h-1; i++){
-		r_border[i]=l_border[i]+road_wide[i];
+		r_border[i]=l_border[i]+road_wide[i];////r_border[i]-30;
 		r_border[i] = limit_a_b(r_border[i], border_min, border_max);	
 		}
 	break;
@@ -1238,11 +1254,10 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 	 //get_turning_point();
 for (i = hightest; i < image_h-1; i++)
 	{
-	  //road_wide[i]=r_border[i]-l_border[i];
+	
 		center_line[i] = (l_border[i] + r_border[i]) >> 1;//求中线
-		//printf("\r\n%d ",road_wide[i]);
+	
 	}
-	//printf("%s","end");
 }
 }
 //

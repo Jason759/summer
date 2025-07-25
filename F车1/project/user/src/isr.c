@@ -68,15 +68,13 @@ void TIM2_IRQHandler (void)
 {   
 	  
     // 此处编写用户代码
-	count2++;
-	
-	  Tracking();
-	//Angle_out();
+	  count2++;
+	 Tracking();	
 	if(count2>=5){
 		  encoder1=encoder_get_count(TIM3_ENCODER);
 			encoder_clear_count(TIM3_ENCODER);
 			encoder2=encoder_get_count(TIM4_ENCODER);
-			encoder_clear_count(TIM4_ENCODER);
+		  encoder_clear_count(TIM4_ENCODER);
 		  left.actual=(Encoder2_get()+Encoder1_get())/2;
 	    increment_pid_update(&left);
 		  motor(left.out-dir.out,left.out+dir.out);
