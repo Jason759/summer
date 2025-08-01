@@ -29,6 +29,7 @@ extern uint8 showflag;
 extern uint8 status;
 extern uint8 flag;
 extern uint8 stop;
+extern uint8 per;
 uint8 DAD_NUM=1;
 
 #ifdef USE_STATIC_MENU
@@ -53,11 +54,15 @@ void menu_save(void)
     flash_union_buffer[3].float_type  = dir.kp;
     flash_union_buffer[4].float_type  = dir.ki;
     flash_union_buffer[5].float_type  = dir.kd2;
-		flash_union_buffer[6].float_type  = basespeed;
+		flash_union_buffer[6].float_type  = dir.kd;
+		flash_union_buffer[7].float_type  = basespeed;
+		flash_union_buffer[8].float_type  = per;
     flash_write_page_from_buffer(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX);        // 向指定 Flash 扇区的页码写入缓冲区数据
 }
 void menu_load(void)
-{
+{   
+	  if(flash_check(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX))                      // 判断是否有数据
+    {
     flash_read_page_to_buffer(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX);           // 将数据从 flash 读取到缓冲区ad_page_to_buffer;
     //参数读出
     left.kp=flash_union_buffer[0].float_type;
@@ -66,8 +71,11 @@ void menu_load(void)
     dir.kp=flash_union_buffer[3].float_type;
     dir.ki=flash_union_buffer[4].float_type;
     dir.kd2=flash_union_buffer[5].float_type;
-    basespeed=flash_union_buffer[6].float_type;
+	  dir.kd=flash_union_buffer[6].float_type;
+    basespeed=flash_union_buffer[7].float_type;
+		per=flash_union_buffer[8].float_type;
     flash_buffer_clear(); //擦除缓存区
+		}
 }
 //函数数组指针
 void (*current_operation_menu)(void);
@@ -585,6 +593,7 @@ void menu_init()
     /*---------------字符串索引初始化----------------*/
     index_xy_init();
 	  /*---------------flash引初始化----------------*/
+	  menu_load();
 }
 void menu_adaptive_display(){
 	  showstr(40,280,"speed:");
@@ -595,7 +604,7 @@ void menu_adaptive_display(){
 		showint32(175,280,left.targ,3);
 	  showint32(175,300,dir.actual,3);
 	  showint32(220,300,status,1);
-	  showint32(190,0,flag,1);
+	  showint32(190,0,per,2);
 	  system_delay_ms(20);
 }
 //菜单函数
@@ -620,6 +629,8 @@ void go(){  	// go go go 出发了
 		right.out=0;
 		flag=0;
 		stop=0;
+		showflag=0;
+		clear();
 	}
 	}
 void Save(void){
@@ -643,6 +654,11 @@ void load(){
 	if(IS_OK){
 	menu_load();	
 	}	
+}void test_open(){
+	if(IS_OK){
+  showflag=2;
+	}	
+	
 }
 //空闲函数
 void NULL_FUN(){
@@ -653,23 +669,21 @@ void UNIT_SET(){
     unit_param_set(&left.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kp");
     unit_param_set(&left.ki,TYPE_FLOAT ,0.001  ,1  ,3,NORMAL_PAR,"left.ki");
     unit_param_set(&left.kd,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"left.kd");
-//    unit_param_set(&Angle.kp,TYPE_FLOAT ,0.001 ,1  ,3,NORMAL_PAR,"Angle.kp");
-//    unit_param_set(&Angle.ki,TYPE_FLOAT ,0.001 ,1  ,3,NORMAL_PAR,"Angle.ki");
-//	  unit_param_set(&Angle.kd,TYPE_FLOAT ,0.01 ,1  ,2,NORMAL_PAR,"Angle.kd");
 	  unit_param_set(&dir.kp,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.kp");
     unit_param_set(&dir.ki,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.ki");
+	  unit_param_set(&dir.kd,TYPE_FLOAT ,0.01 ,2  ,2,NORMAL_PAR,"dir.kd");
 	  unit_param_set(&dir.kd2,TYPE_FLOAT ,0.0001 ,1  ,4,NORMAL_PAR,"dir.kd2");
+	  unit_param_set(&per,TYPE_INT ,1 ,2  ,1,NORMAL_PAR,"per");
     unit_param_set(&basespeed,TYPE_INT ,10  ,3  ,2,NORMAL_PAR,"basespeed1");
-	  unit_param_set(&basespeed,TYPE_INT ,20  ,3  ,2,NORMAL_PAR,"basespeed1");
-	  unit_param_set(&basespeed,TYPE_INT ,50 ,3  ,2,NORMAL_PAR,"basespeed2");
 }
 void FUN_INIT(){
 	//菜单单元函数指针初始化
 	fun_init(go	,"go");
-	fun_init(circle_reset	,"circle_reset");
-	fun_init(BEEP_ON	,"BEEP_on");
-	fun_init(Save	,"Save");
 	fun_init(show_proc	,"show_proc");
+	fun_init(test_open,"test_open");
 	fun_init(off_show	,"off_show");
+	fun_init(circle_reset	,"circle_reset");
+	fun_init(BEEP_ON	,"BEEP_on"); 
+	fun_init(Save	,"Save");
 	fun_init(load	,"load");
 }

@@ -64,7 +64,7 @@ int main (void)
     debug_init();                                                               // 初始化默认 Debug UART
     mt9v03x_init();
 	  mpu6050_init();
-	  wireless_uart_init();
+	  //wireless_uart_init();
 	  //ImagePerspective_Init();   //逆透视初始化
 	  Encoder_Init();
 	  pit_ms_init(TIM2_PIT, 1);   
@@ -74,14 +74,13 @@ int main (void)
 	  menu_init();
 	  while(1){
 		beep_progress();
-		menu_adaptive_display();
     show_process(NULL);
 		image_process();
 		//picture_process();
-		 //image_show();
+		//image_show();
 	switch(showflag){
 	  case 1:  image_show(); break;
-    case 2:  picture_process(); break;
+		case 2:  menu_adaptive_display();  break;
 		default: break;
 	}
 	//rep_show(); //显示逆透视图像

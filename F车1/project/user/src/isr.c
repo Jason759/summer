@@ -62,6 +62,7 @@ void TIM1_UP_IRQHandler (void)
 // 函数简介     TIM2 的定时器中断服务函数 启动 .s 文件定义 不允许修改函数名称
 //              默认优先级 修改优先级使用 interrupt_set_priority(TIM2_IRQn, 1);
 //-------------------------------------------------------------------------------------------------------------------
+extern uint8 stop;
 uint8 count1=0;
 uint8 count2=0;
 void TIM2_IRQHandler (void)
@@ -77,7 +78,10 @@ void TIM2_IRQHandler (void)
 		  encoder_clear_count(TIM4_ENCODER);
 		  left.actual=(Encoder2_get()+Encoder1_get())/2;
 	    increment_pid_update(&left);
-		  motor(left.out-dir.out,left.out+dir.out);
+		if((left.out+dir.out)>95||(left.out-dir.out)>95){
+			stop=1;
+		}
+		motor(left.out-dir.out,left.out+dir.out);
 		  count2=0;
 	}
 	// 此处编写用户代码

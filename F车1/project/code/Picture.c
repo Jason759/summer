@@ -962,7 +962,7 @@ void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, flo
 //* @param uint16 *dir_r				输入右边生长方向首地址
 //* @param uint16(*points_l)[2]		输入左边轮廓首地址
 //* @param uint16(*points_r)[2]		输入右边轮廓首地址
-//*  @see CTest		cross_fill(image,l_border, r_border, data_statics_l, data_statics_r, dir_l, dir_r, points_l, points_r);
+//*  @see CTest		cross_fill();
 //* @return 返回说明
 //*     -<em>false</em> fail
 //*     -<em>true</em> succeed
@@ -970,16 +970,13 @@ void calculate_s_i(uint8 start, uint8 end, uint8 *border, float *slope_rate, flo
 void cross_fill()
 {
 	uint16 i;
-	uint8 start, end;
 	float slope_l_rate = 0, intercept_l = 0;
 	get_turning_point();
 	if (points_l[L_corner2][1]&&bin_image[image_h - 2][4]&&L_lose(0,data_stastics_l-1)>20)//两边生长方向都符合条件
 	{
-		//计算斜率		
-		start = points_l[L_corner2][1] - 15;
-		start = limit_a_b(start, 0, image_h);
-		end = points_l[L_corner2][1]- 5;
-		calculate_s_i(start, end, l_border, &slope_l_rate, &intercept_l);
+	//计算斜率		
+	 slope_l_rate=(float)(points_l[L_corner2][0]-points_l[L_corner2+15][0])/(points_l[L_corner2][1]-points_l[L_corner2+15][1]);
+	 intercept_l=points_l[L_corner2][0]-points_l[L_corner2][1]*slope_l_rate;        ;
 		for (i = points_l[L_corner2][1] - 5; i < image_h - 1; i++)
 		{
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
@@ -988,11 +985,9 @@ void cross_fill()
 	}
 		if(points_r[R_corner2][1]&& bin_image[image_h - 2][image_w - 4]&&R_lose(0,data_stastics_r-1)>20){
 		//计算斜率
-		start = points_r[R_corner2][1] - 15;//起点
-		start = limit_a_b(start, 0, image_h);//限幅
-		end = points_r[R_corner2][1] - 5;//终点
-		calculate_s_i(start, end, r_border, &slope_l_rate, &intercept_l);
 	
+	 slope_l_rate=(float)(points_l[R_corner2][0]-points_l[R_corner2+15][0])/(points_l[R_corner2][1]-points_l[R_corner2+15][1]);
+	 intercept_l=points_l[R_corner2][0]-points_l[R_corner2][1]*slope_l_rate;        ;
 		for (i = points_r[R_corner2][1] - 5; i < image_h - 1; i++)
 		{
 			r_border[i] = slope_l_rate * (i)+intercept_l;
@@ -1009,8 +1004,8 @@ void cross_fill()
 		}
 	}
 		if(points_r[R_corner1][1]&&points_r[R_corner2][1]&&R_lose(0,data_stastics_r-1)>20){
-	 slope_l_rate=(float)(points_r[R_corner1][0]-points_r[R_corner2][0])/(points_r[R_corner1][1]-points_r[R_corner2][1]);
-	 intercept_l=points_r[R_corner1][0]-points_r[R_corner1][1]*slope_l_rate;        ;
+		  slope_l_rate=(float)(points_r[R_corner1][0]-points_r[R_corner2][0])/(points_r[R_corner1][1]-points_r[R_corner2][1]);
+		  intercept_l=points_r[R_corner1][0]-points_r[R_corner1][1]*slope_l_rate;        ;
 		for (i = points_r[R_corner2][1]; i<points_r[R_corner1][1]; i++)
 		{
 			r_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
@@ -1033,10 +1028,10 @@ void rightcircle()
 {
 uint16	 start,end,i;
 	float slope_l_rate = 0, intercept_l = 0;
-	if(L_lose(0,120)>10&&status==1){
+	if(L_lose(60,120)>10&&status==1){
 		status=0;
 }
-	if(status==0&&R_duan_A()&&R_lose(20,120)>30&&L_lose(20,120)<5){	
+	if(status==0&&R_lose(20,120)>30&&L_lose(20,120)<5){	
     beep_on();
 		status=1;
 	}
@@ -1194,9 +1189,9 @@ uint16	 start,end,i;
 		break;
 	}
 }
-void block(){
+uint8 block(){
 	uint16 i;
-	for(i=40;i<=50;i++){
+	for(i=0;i<=110;i++){
 		if((r_border[i]-l_border[i])<road_wide[i]-5)
 			r_border[i]=r_border[i]+3;
 		}
@@ -1250,13 +1245,12 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 	//处理函数放这里
    //rightcircle();
 	 leftcircle();
+	 block();
    //cross_fill();
 	 //get_turning_point();
 for (i = hightest; i < image_h-1; i++)
 	{
-	
 		center_line[i] = (l_border[i] + r_border[i]) >> 1;//求中线
-	
 	}
 }
 }

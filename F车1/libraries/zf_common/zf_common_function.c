@@ -727,14 +727,14 @@ static uint8 number_conversion_ascii (uint32 dat, int8 *p, uint8 neg_type, uint8
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-// 函数简介     printf 显示转换
+// 函数简介     sprintf 显示转换
 // 参数说明     *d_buff         缓冲区
 // 参数说明     len             长度
 // 返回参数     void
-// 使用示例     printf_reverse_order(vstr, vlen);
+// 使用示例     sprintf_reverse_order(vstr, vlen);
 // 备注信息     本函数在文件内部调用 用户不用关注 也不可修改
 //-------------------------------------------------------------------------------------------------------------------
-static void printf_reverse_order (int8 *d_buff, uint32 len)
+static void sprintf_reverse_order (int8 *d_buff, uint32 len)
 {
     uint32 i = 0;
     int8  temp_data = 0;
@@ -792,7 +792,7 @@ uint32 zf_sprintf (int8 *buff, const int8 *format, ...)
                         vstr[vlen] = '-';
                         vlen ++;
                     }
-                    printf_reverse_order(vstr, vlen);
+                    sprintf_reverse_order(vstr, vlen);
                     memcpy(buff, vstr, vlen);
                     buff += vlen;
                     buff_len += vlen;
@@ -810,7 +810,7 @@ uint32 zf_sprintf (int8 *buff, const int8 *format, ...)
                         vstr[vlen] = '-';
                         vlen ++;
                     }
-                    printf_reverse_order(vstr, vlen);
+                    sprintf_reverse_order(vstr, vlen);
                     memcpy(buff, vstr, vlen);
                     buff += vlen;
                     buff_len += vlen;
@@ -835,7 +835,7 @@ uint32 zf_sprintf (int8 *buff, const int8 *format, ...)
                     vstr[vlen] = '.';
                     vlen ++;
 
-                    printf_reverse_order(vstr, vlen);
+                    sprintf_reverse_order(vstr, vlen);
                     memcpy(buff, vstr, vlen);
                     buff_len += vlen;
                 }break;
@@ -846,7 +846,7 @@ uint32 zf_sprintf (int8 *buff, const int8 *format, ...)
                     uint32 ival = (uint32)va_arg(arg, uint32);
                     uint8 vlen = number_conversion_ascii(ival, vstr, 0, 10);
 
-                    printf_reverse_order(vstr, vlen);
+                    sprintf_reverse_order(vstr, vlen);
                     memcpy(buff, vstr, vlen);
                     buff += vlen;
                     buff_len += vlen;
@@ -858,7 +858,7 @@ uint32 zf_sprintf (int8 *buff, const int8 *format, ...)
                     uint32 ival = (uint32)va_arg(arg, uint32);
                     uint8 vlen = number_conversion_ascii(ival, vstr, 0, 8);
 
-                    printf_reverse_order(vstr, vlen);
+                    sprintf_reverse_order(vstr, vlen);
                     memcpy(buff, vstr, vlen);
                     buff += vlen;
                     buff_len += vlen;
@@ -872,7 +872,7 @@ uint32 zf_sprintf (int8 *buff, const int8 *format, ...)
                     uint32 ival = (uint32)va_arg(arg, uint32);
                     uint8 vlen = number_conversion_ascii(ival, vstr, 0, 16);
 
-                    printf_reverse_order(vstr, vlen);
+                    sprintf_reverse_order(vstr, vlen);
                     memcpy(buff, vstr, vlen);
                     buff += vlen;
                     buff_len += vlen;
@@ -896,7 +896,7 @@ uint32 zf_sprintf (int8 *buff, const int8 *format, ...)
                     uint32 ival = (uint32)va_arg(arg, uint32);
                     uint8 vlen = number_conversion_ascii(ival, vstr, 0, 16);
 
-                    printf_reverse_order(vstr, 8);
+                    sprintf_reverse_order(vstr, 8);
                     memcpy(buff, vstr, 8);
                     buff += 8;
                     buff_len += 8;
