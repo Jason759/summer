@@ -76,7 +76,6 @@ int main (void)
 		beep_progress();
     show_process(NULL);
 		image_process();
-		//picture_process();
 		//image_show();
 	switch(showflag){
 	  case 1:  image_show(); break;

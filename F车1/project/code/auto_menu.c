@@ -601,7 +601,7 @@ void menu_adaptive_display(){
 		showint32(95,280,left.actual,3);
 		//showint32(95,300,Angle.actual,3);
 		showstr(125,280,"Trag:");
-		showint32(175,280,left.targ,3);
+		showint32(175,280,basespeed,3);
 	  showint32(175,300,dir.actual,3);
 	  showint32(220,300,status,1);
 	  showint32(190,0,per,2);
@@ -641,7 +641,6 @@ void Save(void){
 void show_proc(void){
 	if(IS_OK){
 	 showflag=1;
-	 showstr(190,0,"pro");
 	}
 }
 void off_show(){
@@ -674,7 +673,7 @@ void UNIT_SET(){
 	  unit_param_set(&dir.kd,TYPE_FLOAT ,0.01 ,2  ,2,NORMAL_PAR,"dir.kd");
 	  unit_param_set(&dir.kd2,TYPE_FLOAT ,0.0001 ,1  ,4,NORMAL_PAR,"dir.kd2");
 	  unit_param_set(&per,TYPE_INT ,1 ,2  ,1,NORMAL_PAR,"per");
-    unit_param_set(&basespeed,TYPE_INT ,10  ,3  ,2,NORMAL_PAR,"basespeed1");
+    unit_param_set(&basespeed,TYPE_INT ,5  ,3  ,2,NORMAL_PAR,"basespeed1");
 }
 void FUN_INIT(){
 	//菜单单元函数指针初始化

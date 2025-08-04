@@ -665,38 +665,54 @@ void get_turning_point(void)
     R_corner2 = 0;
 	  L_corner_angle = 0;
     R_corner_angle = 0;
-	for (i = 1; i < 100; i++)
+	for (i = 115; i >40; i--)
 	{
-		if (L_lose(0,100)>20&&dir_l[i - 1] == 6 && dir_l[i] == 6 && dir_l[i + 1] == 6 && dir_l[i + 3] !=6 && dir_l[i + 5]!=6&&L_lose(0,90)>30)
-		{
+		if (L_lose(0,100)>20&&my_abs(l_border[i]-l_border[i-1])<=4&&my_abs(l_border[i-1]-l_border[i-2])<=4&&
+        my_abs(l_border[i-2]-l_border[i-3])<=4&&((l_border[i]-l_border[i+2])>=3)&&
+        ((l_border[i]-l_border[i+3])>=7)&&((l_border[i]-l_border[i+4])>=7)&&R_lose(0,100)>30){
 			L_corner2=i;//传递y坐标
 			break;
 		}
 	}
-	for (i = 1; i < 50; i++)
+	for (i = 115; i>50; i--)
 	{
-		if (L_lose(0,100)>20&&dir_l[i - 1] !=2 && dir_l[i] != 2 && dir_l[i + 1] == 2 && dir_l[i + 3] == 2 && dir_l[i + 5] == 2&&L_lose(0,90)>30)
+		if (L_lose(0,100)>20&&R_lose(0,100)>20&&my_abs(l_border[i]-l_border[i+1])<=5&&//角点的阈值可以更改
+        my_abs(l_border[i+1]-l_border[i+2])<=5&&my_abs(l_border[i+2]-l_border[i+3])<=5&&
+        ((l_border[i]-l_border[i-2])>=3||l_border[i-2]<=3)&&((l_border[i]-l_border[i-3])>=5||l_border[i-3]<=3)
+		     &&((l_border[i]-l_border[i-4])>=5||l_border[i-4]<=3))
 		{
 			L_corner1=i;//传递y坐标
 			break;
 		}
 	}
-	for (i = 1; i < 100; i++)
+	for (i = 115; i>40; i--)
 	{
-		if (R_lose(0,100)>20&&dir_r[i - 1] == 6 && dir_r[i] == 6 && dir_r[i + 1] == 6 && dir_r[i + 3]!=6 && dir_r[i + 5]!=6&&R_lose(0,90)>30)
+		if(R_lose(0,100)>20&&R_lose(0,100)>20&&my_abs(r_border[i]-r_border[i-1])<=4&&my_abs(r_border[i-1]-r_border[i-2])<=4&&
+       my_abs(r_border[i-2]-r_border[i-3])<=4&&((r_border[i]-r_border[i+2]<=-3))&&
+      ((r_border[i]-r_border[i+3])<=-7)&&((r_border[i]-r_border[i+4])<=-7))
 		{
 			R_corner2=i;//传递y坐标
 			break;
 		}
 	}
-	for (i = 1; i <50; i++)
+	for (i =115; i >50; i--)
 	{
-		if (R_lose(0,100)>20&&dir_r[i - 1] != 2 && dir_r[i] != 2 && dir_r[i + 1] == 2 && dir_r[i + 3] == 2 && dir_r[i + 5] ==2&&R_lose(0,90)>30)
+		if (R_lose(0,100)>20&&L_lose(0,100)>20&&my_abs(r_border[i]-r_border[i+1])<=5&&//角点的阈值可以更改
+           my_abs(r_border[i+1]-r_border[i+2])<=5&&
+           my_abs(r_border[i+2]-r_border[i+3])<=5&&
+            r_border[i]<MT9V03X_W-3&&//右边界点不能为MT9V03X_W-1
+              ((r_border[i]-r_border[i-2])<=-3||r_border[i-2]>MT9V03X_W-4)&&
+              ((r_border[i]-r_border[i-3])<=-5||r_border[i-3]>MT9V03X_W-4)&&
+              ((r_border[i]-r_border[i-4])<=-5||r_border[i-4]>MT9V03X_W-4))
 		{
 			R_corner1=i;//传递y坐标
 			break;
 		}
 }
+	ips200_show_int(190,0,L_corner1,3);
+  ips200_show_int(190,20,L_corner2,3);
+  ips200_show_int(190,40,R_corner1,3);
+  ips200_show_int(190,60,R_corner2,3);
 	}
 /*
 功能说明：找圆环的特征线的点
@@ -720,7 +736,8 @@ uint8 R_duan_A(){
    return 1;
  }
  else{
- }	 return 0;
+	 return 0;
+ }	 
 }
 uint8 R_duan_P(){
 	uint16 i,count=0,flag=0;
@@ -886,7 +903,6 @@ void image_draw_rectan(uint8(*image)[image_w])
 		image[i][1] = 0;
 		image[i][image_w - 1] = 0;
 		image[i][image_w - 2] = 0;
-
 	}
 	for (i = 0; i < image_w; i++)
 	{
@@ -972,46 +988,45 @@ void cross_fill()
 	uint16 i;
 	float slope_l_rate = 0, intercept_l = 0;
 	get_turning_point();
-	if (points_l[L_corner2][1]&&bin_image[image_h - 2][4]&&L_lose(0,data_stastics_l-1)>20)//两边生长方向都符合条件
+	if (L_corner2&&bin_image[image_h - 2][4])//两边生长方向都符合条件
 	{
 	//计算斜率		
-	 slope_l_rate=(float)(points_l[L_corner2][0]-points_l[L_corner2+15][0])/(points_l[L_corner2][1]-points_l[L_corner2+15][1]);
-	 intercept_l=points_l[L_corner2][0]-points_l[L_corner2][1]*slope_l_rate;        ;
-		for (i = points_l[L_corner2][1] - 5; i < image_h - 1; i++)
+	 slope_l_rate=(float)(l_border[L_corner2]-l_border[L_corner2-5])/5;
+	 intercept_l=l_border[L_corner2]-L_corner2*slope_l_rate;        ;
+		for (i=L_corner2- 5; i < image_h - 2; i++)
 		{
 			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
 		}
 	}
-		if(points_r[R_corner2][1]&& bin_image[image_h - 2][image_w - 4]&&R_lose(0,data_stastics_r-1)>20){
-		//计算斜率
-	
-	 slope_l_rate=(float)(points_l[R_corner2][0]-points_l[R_corner2+15][0])/(points_l[R_corner2][1]-points_l[R_corner2+15][1]);
-	 intercept_l=points_l[R_corner2][0]-points_l[R_corner2][1]*slope_l_rate;        ;
-		for (i = points_r[R_corner2][1] - 5; i < image_h - 1; i++)
-		{
-			r_border[i] = slope_l_rate * (i)+intercept_l;
-			r_border[i] = limit_a_b(r_border[i], border_min, border_max);
-		}
-	}
-	if(points_l[L_corner1][1]&&points_l[L_corner2][1]&&L_lose(0,data_stastics_l-1)>20){
-		slope_l_rate=(float)(points_l[L_corner1][0]-points_l[L_corner2][0])/(points_l[L_corner1][1]-points_l[L_corner2][1]);
-	 intercept_l=points_l[L_corner1][0]-points_l[L_corner1][1]*slope_l_rate;        ;
-		for (i = points_l[L_corner2][1]; i<points_l[L_corner1][1]; i++)
-		{
-			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
-			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
-		}
-	}
-		if(points_r[R_corner1][1]&&points_r[R_corner2][1]&&R_lose(0,data_stastics_r-1)>20){
-		  slope_l_rate=(float)(points_r[R_corner1][0]-points_r[R_corner2][0])/(points_r[R_corner1][1]-points_r[R_corner2][1]);
-		  intercept_l=points_r[R_corner1][0]-points_r[R_corner1][1]*slope_l_rate;        ;
-		for (i = points_r[R_corner2][1]; i<points_r[R_corner1][1]; i++)
+		if (R_corner2&&bin_image[image_h - 2][image_w-5])//两边生长方向都符合条件
+	{
+	//计算斜率		
+	 slope_l_rate=(float)(r_border[R_corner2]-r_border[R_corner2-5])/5;
+	 intercept_l=r_border[R_corner2]-R_corner2*slope_l_rate;        ;
+		for (i=R_corner2- 5; i < image_h - 2; i++)
 		{
 			r_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
 			r_border[i] = limit_a_b(r_border[i], border_min, border_max);//限幅
 		}
-		
+	}
+	if(L_corner1&&L_corner2){
+		slope_l_rate=(float)(l_border[L_corner1]-l_border[L_corner2])/(L_corner1-L_corner2);
+	 intercept_l=l_border[L_corner1]-L_corner1*slope_l_rate;        ;
+		for (i = L_corner2; i<L_corner1; i++)
+		{
+			l_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+			l_border[i] = limit_a_b(l_border[i], border_min, border_max);//限幅
+		}
+	}
+		if(R_corner1&&R_corner2){
+		slope_l_rate=(float)(r_border[R_corner1]-r_border[R_corner2])/(R_corner1-R_corner2);
+	 intercept_l=r_border[R_corner1]-R_corner1*slope_l_rate;        ;
+		for (i = R_corner2; i<R_corner1; i++)
+		{
+			r_border[i] = slope_l_rate * (i)+intercept_l;//y = kx+b
+			r_border[i] = limit_a_b(r_border[i], border_min, border_max);//限幅
+		}
 	}
 }
 /*
@@ -1245,7 +1260,7 @@ if (get_start_point())//找到起点了，再执行八领域，没找到就一�
 	//处理函数放这里
    //rightcircle();
 	 leftcircle();
-	 block();
+	// block();
    //cross_fill();
 	 //get_turning_point();
 for (i = hightest; i < image_h-1; i++)

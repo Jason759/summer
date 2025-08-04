@@ -2,19 +2,20 @@
 #include "Picture.h"
 #include "PID.h"
 #include "motor.h"
+#include "math.h"
 extern uint8 center_line[];
 extern uint8 status;
 extern uint8 hightest;
 int gyro_z,gyro_y;
-int16 basespeed=150;    //110  //120  //140    //基准速度
-uint16 per=55; //前瞻  //58  //57   //57   //52
+int16 basespeed=150;    //110  //120  //140    //145基准速度
+uint16 per=57; //前瞻  //58  //57   //57   //57
 PID_t dir={         //方向PID
-	  .kp=1.5,     //0.69  //0.82  //1.45  //1.55
+	  .kp=1.5,     //0.69  //0.82  //1.45  //1.2
 	  .ki=0,
-	  .kd=10,     	//1  //1   //2.5   //15
-   	.kd2=0.005, //0.002  //0,002   //0.005  //0.006
-	  .maxout=50,
-	  .minout=-50,
+	  .kd=10,     	//1  //1   //2.5   //8.5
+   	.kd2=0.005, //0.002  //0,002   //0.005  //0.004
+	  .maxout=40,
+	  .minout=-40,
 	  .targ=93 
 };
 uint8 check(){
@@ -47,20 +48,19 @@ void Tracking(){   	//循迹函数
 	if(check()){
 		mpu6050_get_gyro();
 		gyro_z=mpu6050_gyro_z;
-		gyro_y=mpu6050_gyro_y;
 		if(hightest>per-2){
 			per=hightest+2;
 		}
-		  dir.actual=(center_line[per-2]+center_line[per-2]+center_line[per]+center_line[per+1]+center_line[per+2])/5;		//预瞄点，速度越快，前瞻越远 53
+		dir.actual=(center_line[per-2]+center_line[per-1]+center_line[per]+center_line[per+1]+center_line[per+2])/5;		//预瞄点，速度越快，前瞻越远 53
 	    PID_gyro_update(&dir,gyro_z);
 	    motor_set_target(basespeed,basespeed);
 	}	
 	else{
 		stop=1;
 		}
-//	if(center_line[per]<95&&center_line[per]>90&&hightest<3){
-//		motor_set_target(190,190);
-//	}
+	if(center_line[per-30]<97&&center_line[per-30]>89&&(per-30)>hightest&&R_lose(hightest,120)<5&&L_lose(hightest,120)<5){
+		motor_set_target(240,240);
+	}
 	if(status==1||status==2||status==3||status==4||status==5){   //圆环减速
 	  motor_set_target(120,120);
 	}  

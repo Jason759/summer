@@ -78,9 +78,9 @@ void TIM2_IRQHandler (void)
 		  encoder_clear_count(TIM4_ENCODER);
 		  left.actual=(Encoder2_get()+Encoder1_get())/2;
 	    increment_pid_update(&left);
-		if((left.out+dir.out)>95||(left.out-dir.out)>95){
-			stop=1;
-		}
+//		if((left.out+dir.out)>95||(left.out-dir.out)>95){
+//			stop=1;
+//		}
 		motor(left.out-dir.out,left.out+dir.out);
 		  count2=0;
 	}
