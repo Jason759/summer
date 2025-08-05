@@ -14,9 +14,13 @@ void Motor_Init(void)
    
     gpio_init(DIR_L, GPO, GPIO_HIGH, GPO_PUSH_PULL);                            // GPIO 初始化为输出 默认上拉输出高
     pwm_init(PWM_L, 17000, 0);                                                  // PWM 通道初始化频率 17KHz 占空比初始为 0
-
+    
     gpio_init(DIR_R, GPO, GPIO_HIGH, GPO_PUSH_PULL);                            // GPIO 初始化为输出 默认上拉输出高
-    pwm_init(PWM_R, 17000, 0);                                                  // PWM 通道初始化频率 17KHz 占空比初始为 0
+    pwm_init(PWM_R, 17000, 0);	// PWM 通道初始化频率 17KHz 占空比初始为 0
+//	pwm_init(PWM_L_H, 17000, 0);
+//	pwm_init(PWM_L_L, 17000, 0);
+//	pwm_init(PWM_R_H, 17000, 0);
+//	pwm_init(PWM_R_L, 17000, 0);
 }
 
 /**
@@ -25,15 +29,13 @@ void Motor_Init(void)
   * 返 回 值：无
   */
 void Motor_SetLeftSpeed(int8_t duty)
-{
-	if ((duty*100)>PWM_DUTY_MAX){duty=PWM_DUTY_MAX/101;}
-	if (((-duty)*100)>PWM_DUTY_MAX){duty=-(PWM_DUTY_MAX/101);}
-		
+{		
 	if (duty >= 0)							//如果设置正转的速度值
 	{
 		gpio_set_level(DIR_L, GPIO_HIGH);
 		pwm_set_duty(PWM_L, duty*100 );                  
                               
+		
 	}
 	else									//否则，即设置反转的速度值
 	{  
@@ -54,9 +56,41 @@ void Motor_SetRightSpeed(int8_t duty)
     pwm_set_duty(PWM_R, (-duty)*100);               // 计算占空
 }
 	}
+//void Motor_SetLeftSpeed(int8_t duty)
+//{		
+//	if (duty >= 0)							//如果设置正转的速度值
+//	{
+//		
+//		pwm_set_duty(PWM_L_H, duty*100 );
+//    pwm_set_duty(PWM_L_L, 0 );   	
+//                              
+//	}
+//	else									//否则，即设置反转的速度值
+//	{  
+//		 pwm_set_duty(PWM_L_H, 0 );   
+//     pwm_set_duty(PWM_L_L, (-duty)*100);
+//	}
+//}
+//void Motor_SetRightSpeed(int8_t duty)
+//{
+//	if (duty >= 0)							//如果设置正转的速度值
+//	{
+//		pwm_set_duty(PWM_R_L,0);
+//		pwm_set_duty(PWM_R_H, duty*100);                  // 计算占空比           
+//	}
+//	else									//否则，即设置反转的速度值
+//	{ 
+//		pwm_set_duty(PWM_R_H,0);
+//    pwm_set_duty(PWM_R_L, (-duty)*100);               // 计算占空
+//}
+//	}
 void motor(int left,int right){
-	Motor_SetRightSpeed(left);
-	Motor_SetLeftSpeed(right);
+	if ((left*100)>=PWM_DUTY_MAX){left=PWM_DUTY_MAX/100;}
+	if (((-left)*100)>=PWM_DUTY_MAX){left=-(PWM_DUTY_MAX/100);}
+	if ((right*100)>=PWM_DUTY_MAX){right=PWM_DUTY_MAX/100;}
+	if (((-right)*100)>=PWM_DUTY_MAX){right=-(PWM_DUTY_MAX/100);}
+	Motor_SetRightSpeed(right);
+	Motor_SetLeftSpeed(left);
 }
 void motor_set_target(int l,int r){
 	left.targ=l;

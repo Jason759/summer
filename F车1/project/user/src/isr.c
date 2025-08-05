@@ -81,7 +81,7 @@ void TIM2_IRQHandler (void)
 //		if((left.out+dir.out)>95||(left.out-dir.out)>95){
 //			stop=1;
 //		}
-		motor(left.out-dir.out,left.out+dir.out);
+		  motor(left.out-dir.out,left.out+dir.out);
 		  count2=0;
 	}
 	// 此处编写用户代码

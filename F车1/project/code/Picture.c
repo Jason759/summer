@@ -1204,7 +1204,7 @@ uint16	 start,end,i;
 		break;
 	}
 }
-uint8 block(){
+void block(){
 	uint16 i;
 	for(i=0;i<=110;i++){
 		if((r_border[i]-l_border[i])<road_wide[i]-5)
@@ -1241,7 +1241,6 @@ void image_process(void)
 	
 	float slope_l_rate = 0, intercept_l = 0;
 uint16 i;
-uint8 hightest = 0;//定义一个最高行，tip：这里的最高指的是y值的最小
 /*这是离线调试用的*/
 Get_image(mt9v03x_image);
 turn_to_bin();
