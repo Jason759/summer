@@ -544,11 +544,11 @@ ARM Macro Assembler    Page 9
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M3 --depe
-nd=.\objects\startup_mm32f3277g.d -o.\objects\startup_mm32f3277g.o -I"C:\Users\
-18358\Desktop\Keil5 C51\MindMotion\MM32F3270_DFP\1.0.6\Device\MM32F327x\Include
-" --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UV
-ISION_VERSION SETA 538" --predefine="MM32F3273G8P SETA 1" --list=.\listings\sta
-rtup_mm32f3277g.lst ..\..\libraries\sdk\mdk\startup_mm32f3277g.s
+nd=.\objects\startup_mm32f3277g.d -o.\objects\startup_mm32f3277g.o -IC:\Users\1
+8358\AppData\Local\Arm\Packs\MindMotion\MM32F3270_DFP\1.0.6\Device\MM32F327x\In
+clude --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 543" 
+--predefine="MM32F3273G8P SETA 1" --list=.\listings\startup_mm32f3277g.lst ..\.
+.\libraries\sdk\mdk\startup_mm32f3277g.s
 
 
 
@@ -1365,4 +1365,4 @@ Symbol: __main
       At line 142 in file ..\..\libraries\sdk\mdk\startup_mm32f3277g.s
 Comment: __main used once
 3 symbols
-417 symbols in table
+416 symbols in table

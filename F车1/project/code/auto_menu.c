@@ -24,12 +24,12 @@ extern  PID_t left;
 extern  PID_t right;
 extern  PID_t dir;
 extern  PID_t Angle;
-extern uint8 basespeed;
+extern int16 basespeed;
 extern uint8 showflag;
-extern uint8 status;
+extern uint8 status_L,status_R;
 extern uint8 flag;
 extern uint8 stop;
-extern uint8 per;
+extern uint16 set_per;
 uint8 DAD_NUM=1;
 
 #ifdef USE_STATIC_MENU
@@ -56,7 +56,7 @@ void menu_save(void)
     flash_union_buffer[5].float_type  = dir.kd2;
 		flash_union_buffer[6].float_type  = dir.kd;
 		flash_union_buffer[7].float_type  = basespeed;
-		flash_union_buffer[8].float_type  = per;
+		flash_union_buffer[8].float_type  = set_per;
     flash_write_page_from_buffer(FLASH_SECTION_INDEX, FLASH_PAGE_INDEX);        // 向指定 Flash 扇区的页码写入缓冲区数据
 }
 void menu_load(void)
@@ -73,7 +73,7 @@ void menu_load(void)
     dir.kd2=flash_union_buffer[5].float_type;
 	  dir.kd=flash_union_buffer[6].float_type;
     basespeed=flash_union_buffer[7].float_type;
-		per=flash_union_buffer[8].float_type;
+		set_per=flash_union_buffer[8].float_type;
     flash_buffer_clear(); //擦除缓存区
 		}
 }
@@ -603,8 +603,9 @@ void menu_adaptive_display(){
 		showstr(125,280,"Trag:");
 		showint32(175,280,basespeed,3);
 	  showint32(175,300,dir.actual,3);
-	  showint32(220,300,status,1);
-	  showint32(190,0,per,2);
+	  showint32(220,300,status_L,1);
+	  showint32(200,300,status_R,1);
+	  showint32(190,0,set_per,2);
 	  system_delay_ms(20);
 }
 //菜单函数
@@ -612,7 +613,8 @@ void menu_adaptive_display(){
 static uint16 IPS200_BGCOLOR = RGB565_WHITE;
 void circle_reset(){
 	if(IS_OK){
-		status=0;
+		status_L=0;
+    status_R=0;
 }
 }
 void BEEP_ON(){
@@ -672,7 +674,7 @@ void UNIT_SET(){
     unit_param_set(&dir.ki,TYPE_FLOAT ,0.01  ,1  ,2,NORMAL_PAR,"dir.ki");
 	  unit_param_set(&dir.kd,TYPE_FLOAT ,0.01 ,2  ,2,NORMAL_PAR,"dir.kd");
 	  unit_param_set(&dir.kd2,TYPE_FLOAT ,0.0001 ,1  ,4,NORMAL_PAR,"dir.kd2");
-	  unit_param_set(&per,TYPE_INT ,1 ,2  ,1,NORMAL_PAR,"per");
+	  unit_param_set(&set_per,TYPE_INT ,1 ,2  ,1,NORMAL_PAR,"per");
     unit_param_set(&basespeed,TYPE_INT ,5  ,3  ,2,NORMAL_PAR,"basespeed1");
 }
 void FUN_INIT(){

@@ -43,7 +43,7 @@ extern uint8 image_thereshold;
 uint8 showflag=0;
 PID_t left={
 	  .kp=0.3,   //0.3
-	  .ki=0.012,  //0.02//0.01
+	  .ki=0.015, //0.02//0.01
 	  .kd=0,
 	  .maxout=50,
 	  .minout=-50,
@@ -79,7 +79,8 @@ int main (void)
 		//image_show();
 	switch(showflag){
 	  case 1:  image_show(); break;
-		case 2:  menu_adaptive_display();  break;
+		case 2:  image_show();
+			menu_adaptive_display();  break;
 		default: break;
 	}
 	//rep_show(); //显示逆透视图像
